@@ -5806,62 +5806,47 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
 
 <style id="circle-skeleton-and-ask-space-ui">
-/* Learn video skeleton: replaces the loading wheel without changing the player. */
+/* Learn video skeleton: one continuous left-to-right sheen over the 16:9 preview. */
 #learn-loading.learn-loading {
     align-items: stretch;
     justify-content: stretch;
-    background: #050505;
+    background: #070707;
     overflow: hidden;
 }
 .learn-video-skeleton {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    background: #070707;
+    background: #090909;
     isolation: isolate;
 }
 .learn-video-skeleton::after {
     content: "";
     position: absolute;
-    inset: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 34%;
     z-index: 5;
     pointer-events: none;
-    background: linear-gradient(108deg, transparent 18%, rgba(255,255,255,.025) 34%, rgba(255,255,255,.095) 48%, rgba(255,255,255,.025) 62%, transparent 78%);
-    background-size: 220% 100%;
-    animation: circleSkeletonShimmer 1.65s ease-in-out infinite;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.035) 24%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.035) 76%, transparent 100%);
+    transform: translate3d(-120%, 0, 0);
+    will-change: transform;
+    animation: circleSkeletonSweep 1.45s linear infinite;
 }
+/* Keep the preview a clean, fake 16:9 placeholder instead of showing static fake controls. */
 .learn-video-skeleton-header,
 .learn-video-skeleton-main,
 .learn-video-skeleton-meta,
 .learn-video-skeleton-progress {
-    position: absolute;
-    display: block;
-    background: linear-gradient(90deg, #111 0%, #1a1a1a 45%, #111 100%);
-    border: 1px solid rgba(255,255,255,.035);
+    display: none !important;
 }
-.learn-video-skeleton-header {
-    top: 7%; left: 5.5%; width: 28%; height: 5.5%; min-height: 10px;
-    border-radius: 6px;
-}
-.learn-video-skeleton-main {
-    top: 18%; left: 5.5%; right: 5.5%; height: 65%;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #0b0b0b, #141414 52%, #090909);
-}
-.learn-video-skeleton-meta {
-    left: 5.5%; bottom: 7%; width: 22%; height: 4%; min-height: 7px;
-    border-radius: 5px;
-}
-.learn-video-skeleton-progress {
-    left: 5.5%; right: 5.5%; bottom: 3%; height: 3px;
-    border: 0; border-radius: 999px; background: #222;
-}
-@keyframes circleSkeletonShimmer {
-    from { background-position: 120% 0; }
-    to { background-position: -120% 0; }
+@keyframes circleSkeletonSweep {
+    from { transform: translate3d(-120%, 0, 0); }
+    to { transform: translate3d(360%, 0, 0); }
 }
 
-/* Playlist skeleton placeholders use the current playlist's own layout rules. */
+/* Playlist placeholders use the actual thumbnail dimensions and the same moving sheen. */
 .learn-thumb-skeleton {
     position: relative;
     display: block;
@@ -5871,25 +5856,45 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     border: 1px solid rgba(255,255,255,.045);
     border-radius: 11px;
     overflow: hidden;
-    background: linear-gradient(100deg, #0b0b0b 20%, #171717 43%, #0b0b0b 65%);
-    background-size: 220% 100%;
-    animation: circleSkeletonShimmer 1.65s ease-in-out infinite;
+    background: #0b0b0b;
 }
 .learn-thumb-skeleton:last-child { margin-bottom: 0; }
-.learn-thumb-skeleton::before {
+.learn-thumb-skeleton::before,
+.learn-thumb.is-loading::before {
     content: "";
     position: absolute;
-    left: 6%; top: 13%; width: 34%; height: 8%;
-    border-radius: 4px;
-    background: rgba(255,255,255,.06);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 38%;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.035) 24%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.035) 76%, transparent 100%);
+    transform: translate3d(-120%, 0, 0);
+    will-change: transform;
+    animation: circleSkeletonSweep 1.45s linear infinite;
+    z-index: 2;
 }
-.learn-thumb-skeleton::after {
-    content: "";
-    position: absolute;
-    left: 6%; bottom: 13%; width: 47%; height: 7%;
-    border-radius: 4px;
-    background: rgba(255,255,255,.045);
+.learn-thumb-skeleton::after { display: none; }
+.learn-thumb.is-loading {
+    background: #0b0b0b !important;
 }
+.learn-thumb.is-loading img {
+    opacity: 0 !important;
+}
+.learn-thumb:not(.is-loading):not(.completed) img {
+    opacity: 1;
+    transition: opacity .16s ease;
+}
+.learn-thumb.completed:not(.is-loading) img {
+    opacity: .62;
+    transition: opacity .16s ease;
+}
+.learn-thumb.image-unavailable {
+    background: #101010 !important;
+}
+.learn-thumb.image-unavailable img { opacity: 0 !important; }
+.learn-thumb.image-unavailable::before { display: none; }
 
 /* Ask landing-page cards. The carousel disappears naturally while a chat is active. */
 #ask-feature-carousel.ask-feature-carousel {
@@ -10643,17 +10648,38 @@ setInterval(() => {
                 const active = index === learnActiveIndex;
                 const completed = index < savedIndex;
                 return `
-                    <button class="learn-thumb ${active ? 'active' : ''} ${completed ? 'completed' : ''}"
+                    <button class="learn-thumb is-loading ${active ? 'active' : ''} ${completed ? 'completed' : ''}"
                             type="button"
                             data-learn-index="${index}"
                             aria-label="Lecture ${String(index + 1).padStart(2, '0')}">
-                        <img loading="lazy" src="https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg" alt="">
+                        <img loading="lazy" decoding="async" src="https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg" alt="">
                     </button>
                 `;
             }).join('');
 
             container.querySelectorAll('.learn-thumb').forEach(button => {
                 button.addEventListener('click', () => openLearnLesson(Number(button.dataset.learnIndex)));
+            });
+
+            /* Keep the skeleton visible for each individual thumbnail until its
+             * YouTube image has actually loaded (or failed), not merely until the
+             * playlist ID list becomes available. */
+            container.querySelectorAll('.learn-thumb img').forEach(image => {
+                const thumbnail = image.closest('.learn-thumb');
+                if (!thumbnail) return;
+
+                const finishThumbnailLoad = () => {
+                    if (image.naturalWidth > 0) {
+                        thumbnail.classList.remove('is-loading', 'image-unavailable');
+                    } else {
+                        thumbnail.classList.remove('is-loading');
+                        thumbnail.classList.add('image-unavailable');
+                    }
+                };
+
+                image.addEventListener('load', finishThumbnailLoad, { once: true });
+                image.addEventListener('error', finishThumbnailLoad, { once: true });
+                if (image.complete) finishThumbnailLoad();
             });
 
             if (learnFocusSavedThumbnailPending) {
