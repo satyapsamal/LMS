@@ -20,7 +20,7 @@
     <!-- Open Graph / Social Sharing -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Circle">
-    <meta property="og:description" content="Your student-led BBA assistant for quick answers, exam updates, study resources, and academic guidance. Ask Circle AI. Learn faster, understand better.">
+    <meta property="og:description" content="Your student-led BBA assistant for quick answers, exaam updates, study resources, and academic guidance. Ask Circle AI. Learn faster, understand better.">
     <meta property="og:image" content="https://raw.githubusercontent.com/satyapsamal/circle/main/circle-promo.png">
 
     <!-- Twitter / X Sharing -->
@@ -5767,6 +5767,43 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 }
 </style>
 
+
+<style id="circle-thumbnail-resize-fix">
+/* Keep the Learn playlist thumbnails in the same single-column logic used by
+   the normal desktop playlist when the browser is temporarily resized. */
+@media (min-width: 769px) and (max-width: 1099px) and (orientation: landscape) {
+    #learn-thumbnails,
+    .learn-thumbnails {
+        display: flex !important;
+        flex-direction: column !important;
+        align-content: flex-start !important;
+        align-items: stretch !important;
+        grid-template-columns: none !important;
+        grid-auto-columns: none !important;
+        grid-auto-rows: max-content !important;
+        gap: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #learn-thumbnails .learn-thumb,
+    .learn-thumbnails .learn-thumb {
+        flex: 0 0 auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        aspect-ratio: 16 / 9 !important;
+        margin: 0 0 9px !important;
+    }
+
+    #learn-thumbnails .learn-thumb:last-child,
+    .learn-thumbnails .learn-thumb:last-child {
+        margin-bottom: 0 !important;
+    }
+}
+</style>
+
 </head>
 <body>
 
@@ -7349,7 +7386,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 playlistId: 'PL59tH4pjx8SCk7LmDwxbmiYXrwn4DaZZm',
                 playlists: {
                     hindi: 'PL59tH4pjx8SCk7LmDwxbmiYXrwn4DaZZm',
-                    english: 'PLdrrCj5qtwEY'
+                    english: 'PLNOcwfLgABHA'
                 },
                 code: 'BBA112'
             },
@@ -7359,7 +7396,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 playlistId: 'PL59tH4pjx8SCqngJcM7uWg81BnOXiuaNM',
                 playlists: {
                     hindi: 'PL59tH4pjx8SCqngJcM7uWg81BnOXiuaNM',
-                    english: 'PLdrrCj5qtwEY'
+                    english: 'PLFWJQ2yMZzHk'
                 },
                 code: 'BBA114'
             },
@@ -7369,7 +7406,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 playlistId: 'PL59tH4pjx8SB2v1pdapHJcxcGq-Mj4r4-',
                 playlists: {
                     hindi: 'PL59tH4pjx8SB2v1pdapHJcxcGq-Mj4r4-',
-                    english: 'PLdrrCj5qtwEY'
+                    english: 'PLLMJCuaH86dA'
                 },
                 code: 'BBA115'
             }
