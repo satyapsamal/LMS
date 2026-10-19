@@ -5804,6 +5804,266 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 }
 </style>
 
+
+<style id="circle-skeleton-and-ask-space-ui">
+/* Learn video skeleton: replaces the loading wheel without changing the player. */
+#learn-loading.learn-loading {
+    align-items: stretch;
+    justify-content: stretch;
+    background: #050505;
+    overflow: hidden;
+}
+.learn-video-skeleton {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #070707;
+    isolation: isolate;
+}
+.learn-video-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: linear-gradient(108deg, transparent 18%, rgba(255,255,255,.025) 34%, rgba(255,255,255,.095) 48%, rgba(255,255,255,.025) 62%, transparent 78%);
+    background-size: 220% 100%;
+    animation: circleSkeletonShimmer 1.65s ease-in-out infinite;
+}
+.learn-video-skeleton-header,
+.learn-video-skeleton-main,
+.learn-video-skeleton-meta,
+.learn-video-skeleton-progress {
+    position: absolute;
+    display: block;
+    background: linear-gradient(90deg, #111 0%, #1a1a1a 45%, #111 100%);
+    border: 1px solid rgba(255,255,255,.035);
+}
+.learn-video-skeleton-header {
+    top: 7%; left: 5.5%; width: 28%; height: 5.5%; min-height: 10px;
+    border-radius: 6px;
+}
+.learn-video-skeleton-main {
+    top: 18%; left: 5.5%; right: 5.5%; height: 65%;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0b0b0b, #141414 52%, #090909);
+}
+.learn-video-skeleton-meta {
+    left: 5.5%; bottom: 7%; width: 22%; height: 4%; min-height: 7px;
+    border-radius: 5px;
+}
+.learn-video-skeleton-progress {
+    left: 5.5%; right: 5.5%; bottom: 3%; height: 3px;
+    border: 0; border-radius: 999px; background: #222;
+}
+@keyframes circleSkeletonShimmer {
+    from { background-position: 120% 0; }
+    to { background-position: -120% 0; }
+}
+
+/* Playlist skeleton placeholders use the current playlist's own layout rules. */
+.learn-thumb-skeleton {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: 0 0 8px;
+    border: 1px solid rgba(255,255,255,.045);
+    border-radius: 11px;
+    overflow: hidden;
+    background: linear-gradient(100deg, #0b0b0b 20%, #171717 43%, #0b0b0b 65%);
+    background-size: 220% 100%;
+    animation: circleSkeletonShimmer 1.65s ease-in-out infinite;
+}
+.learn-thumb-skeleton:last-child { margin-bottom: 0; }
+.learn-thumb-skeleton::before {
+    content: "";
+    position: absolute;
+    left: 6%; top: 13%; width: 34%; height: 8%;
+    border-radius: 4px;
+    background: rgba(255,255,255,.06);
+}
+.learn-thumb-skeleton::after {
+    content: "";
+    position: absolute;
+    left: 6%; bottom: 13%; width: 47%; height: 7%;
+    border-radius: 4px;
+    background: rgba(255,255,255,.045);
+}
+
+/* Ask landing-page cards. The carousel disappears naturally while a chat is active. */
+#ask-feature-carousel.ask-feature-carousel {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 0 12px;
+    padding: 1px 2px 5px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+}
+#ask-feature-carousel::-webkit-scrollbar { display: none; }
+.ask-feature-card {
+    position: relative;
+    display: flex;
+    flex: 1 0 calc(50% - 5px);
+    min-width: 255px;
+    min-height: 86px;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 30px 11px 11px;
+    border: 1px solid rgba(255,255,255,.105);
+    border-radius: 17px;
+    background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+    color: #f3f3f3;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.ask-feature-card:hover {
+    background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+    border-color: rgba(255,255,255,.2);
+    transform: translateY(-1px);
+}
+.ask-feature-visual {
+    width: 64px;
+    height: 62px;
+    flex: 0 0 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.ask-feature-visual svg { width: 43px; height: 43px; display: block; }
+.ask-feature-visual-space { background: radial-gradient(circle at 30% 20%, rgba(147,171,204,.20), transparent 60%), linear-gradient(145deg, #1d2530, #101114); }
+.ask-feature-visual-community { background: radial-gradient(circle at 75% 25%, rgba(126,207,166,.18), transparent 55%), linear-gradient(145deg, #1b2a25, #101411); }
+.ask-feature-copy { display: flex; flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: flex-start; gap: 5px; }
+.ask-feature-copy strong { color: #f4f4f4; font: 600 12px/1.25 var(--font-conversational); }
+.ask-feature-copy span { color: #929292; font: 400 10px/1.45 var(--font-conversational); white-space: normal; }
+.ask-feature-arrow { position: absolute; right: 12px; top: 12px; color: #777; font: 400 13px/1 var(--font-conversational); }
+body.chat-active #ask-feature-carousel { display: none !important; }
+
+/* My Space notes modal */
+#my-space-modal.my-space-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 130000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(0,0,0,.70);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .22s ease, visibility .22s ease;
+}
+#my-space-modal.my-space-modal.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+.my-space-dialog {
+    width: min(620px, calc(100vw - 28px));
+    max-height: min(84vh, 760px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px;
+    background: linear-gradient(180deg, #121212, #080808);
+    box-shadow: 0 28px 85px rgba(0,0,0,.58);
+    transform: translateY(8px) scale(.99);
+    transition: transform .22s ease;
+}
+#my-space-modal.open .my-space-dialog { transform: translateY(0) scale(1); }
+.my-space-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 22px 17px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.my-space-header h2 { color: #f5f5f5; font: 500 21px/1.25 var(--font-ui); }
+.my-space-header p { margin-top: 5px; color: #858585; font: 400 11px/1.5 var(--font-conversational); }
+.my-space-close {
+    width: 32px; height: 32px; flex: 0 0 32px;
+    border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+    background: rgba(255,255,255,.035); color: #aaa; font-size: 20px; cursor: pointer;
+}
+.my-space-close:hover { background: rgba(255,255,255,.08); color: #fff; }
+.my-space-list-meta { padding: 15px 22px 9px; color: #777; font: 500 10px var(--font-conversational); }
+.my-space-notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-height: 100px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 16px 18px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.18) transparent;
+}
+.my-space-note-card {
+    padding: 13px 14px;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 13px;
+    background: rgba(255,255,255,.025);
+}
+.my-space-note-title { color: #ededed; font: 600 11px/1.45 var(--font-conversational); }
+.my-space-note-preview {
+    margin-top: 7px;
+    color: #959595;
+    font: 400 11px/1.65 var(--font-conversational);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+}
+.my-space-empty {
+    margin: 0 6px 6px;
+    padding: 28px 20px;
+    border: 1px dashed rgba(255,255,255,.12);
+    border-radius: 14px;
+    text-align: center;
+    color: #999;
+    font: 400 12px/1.7 var(--font-conversational);
+}
+@media (max-width: 600px) {
+    #ask-feature-carousel.ask-feature-carousel { gap: 9px; margin-bottom: 10px; }
+    .ask-feature-card { flex: 0 0 min(82vw, 300px); min-width: min(82vw, 300px); min-height: 82px; padding: 9px 28px 9px 9px; gap: 10px; border-radius: 15px; }
+    .ask-feature-visual { width: 58px; height: 60px; flex-basis: 58px; border-radius: 11px; }
+    .ask-feature-visual svg { width: 40px; height: 40px; }
+    .ask-feature-copy strong { font-size: 12px; }
+    .ask-feature-copy span { font-size: 9.5px; }
+    #my-space-modal.my-space-modal { padding: 12px; }
+    .my-space-dialog { width: 100%; max-height: 86vh; border-radius: 17px; }
+    .my-space-header { padding: 18px 17px 14px; }
+    .my-space-header h2 { font-size: 19px; }
+    .my-space-list-meta { padding: 13px 17px 8px; }
+    .my-space-notes-list { padding: 0 12px 14px; }
+    .my-space-note-card { padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .learn-video-skeleton::after, .learn-thumb-skeleton { animation: none !important; }
+}
+</style>
+
 </head>
 <body>
 
@@ -6083,6 +6343,20 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             </div>
         </div>
 
+        <div id="my-space-modal" class="my-space-modal" aria-hidden="true">
+            <section class="my-space-dialog" role="dialog" aria-modal="true" aria-labelledby="my-space-title">
+                <header class="my-space-header">
+                    <div>
+                        <h2 id="my-space-title">My Space</h2>
+                        <p>Your saved lecture notes, all in one place.</p>
+                    </div>
+                    <button id="my-space-close" class="my-space-close" type="button" aria-label="Close My Space">×</button>
+                </header>
+                <div class="my-space-list-meta" id="my-space-note-count">Your notes</div>
+                <div id="my-space-notes-list" class="my-space-notes-list" aria-live="polite"></div>
+            </section>
+        </div>
+
         <!-- =====================================================
              LEARN MODE
              Desktop: My Learnings | Video | Playlist / To-do / Notes
@@ -6144,7 +6418,14 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     <div class="learn-workspace">
                         <div class="learn-video-stage">
                             <div id="learn-player"></div>
-                            <div id="learn-loading" class="learn-loading" aria-label="Loading Learn"><span class="learn-loading-circle" aria-hidden="true"></span></div>
+                            <div id="learn-loading" class="learn-loading" aria-label="Loading lesson" role="status">
+                                <div class="learn-video-skeleton" aria-hidden="true">
+                                    <span class="learn-video-skeleton-header"></span>
+                                    <span class="learn-video-skeleton-main"></span>
+                                    <span class="learn-video-skeleton-meta"></span>
+                                    <span class="learn-video-skeleton-progress"></span>
+                                </div>
+                            </div>
                         </div>
 
                         <aside class="learn-playlist" id="learn-right-panel" aria-label="Learn tools">
@@ -6269,6 +6550,39 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             </div>
 
             <div id="input-container">
+                <div id="ask-feature-carousel" class="ask-feature-carousel" aria-label="Explore Circle">
+                    <button id="ask-feature-my-space" class="ask-feature-card" type="button" aria-haspopup="dialog" aria-controls="my-space-modal">
+                        <span class="ask-feature-visual ask-feature-visual-space" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <path d="M12 9.5A4.5 4.5 0 0 1 16.5 5H37v29.5a4.5 4.5 0 0 0-4.5-4.5H12V9.5Z" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.72)" stroke-width="1.4"/>
+                                <path d="M12 9.5V37a4 4 0 0 0 4 4h16.5A4.5 4.5 0 0 0 37 36.5V34H16.5A4.5 4.5 0 0 1 12 29.5" stroke="rgba(255,255,255,.72)" stroke-width="1.4"/>
+                                <path d="M19 13h12M19 18h12M19 23h8" stroke="#fff" stroke-linecap="round" stroke-width="1.6"/>
+                            </svg>
+                        </span>
+                        <span class="ask-feature-copy">
+                            <strong>My Space</strong>
+                            <span>All your lecture notes, in one place.</span>
+                        </span>
+                        <span class="ask-feature-arrow" aria-hidden="true">↗</span>
+                    </button>
+                    <a id="ask-feature-bba-circle" class="ask-feature-card" href="https://chat.whatsapp.com/HPvD613vpgkF9ABUZXS3My" target="_blank" rel="noopener noreferrer" aria-label="Join BBA Circle on WhatsApp">
+                        <span class="ask-feature-visual ask-feature-visual-community" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none">
+                                <circle cx="24" cy="16" r="6" fill="rgba(255,255,255,.20)" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/>
+                                <path d="M13 36c.8-6.2 4.7-9.5 11-9.5S34.2 29.8 35 36" stroke="rgba(255,255,255,.8)" stroke-width="1.6" stroke-linecap="round"/>
+                                <circle cx="11.5" cy="19" r="4" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.55)" stroke-width="1.3"/>
+                                <path d="M4.5 34c.5-4.4 2.9-6.7 6.9-6.7 1.5 0 2.7.3 3.7.9" stroke="rgba(255,255,255,.55)" stroke-width="1.4" stroke-linecap="round"/>
+                                <circle cx="36.5" cy="19" r="4" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.55)" stroke-width="1.3"/>
+                                <path d="M33 28.2c1-.6 2.2-.9 3.7-.9 4 0 6.4 2.3 6.9 6.7" stroke="rgba(255,255,255,.55)" stroke-width="1.4" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        <span class="ask-feature-copy">
+                            <strong>BBA Circle</strong>
+                            <span>Meet fellow BBA students and study together.</span>
+                        </span>
+                        <span class="ask-feature-arrow" aria-hidden="true">↗</span>
+                    </a>
+                </div>
                 <div id="suggestion-pills">
                     <!-- Pills injected via JS -->
                 </div>
@@ -8543,6 +8857,20 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         function setupEventListeners() {
             mountShellModelControl();
+
+            const mySpaceTrigger = document.getElementById('ask-feature-my-space');
+            const mySpaceModal = document.getElementById('my-space-modal');
+            const mySpaceClose = document.getElementById('my-space-close');
+            if (mySpaceTrigger) mySpaceTrigger.addEventListener('click', openMySpaceModal);
+            if (mySpaceClose) mySpaceClose.addEventListener('click', closeMySpaceModal);
+            if (mySpaceModal) {
+                mySpaceModal.addEventListener('click', (event) => {
+                    if (event.target === mySpaceModal) closeMySpaceModal();
+                });
+            }
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeMySpaceModal();
+            });
             /* Unified shell navigation */
             document.getElementById('shell-learn-btn').addEventListener('click', () => switchCircleMode('learn'));
             document.getElementById('shell-ask-btn').addEventListener('click', () => switchCircleMode('ask'));
@@ -10233,10 +10561,80 @@ setInterval(() => {
             container.scrollTop = Math.max(0, Math.min(centeredTop, maxScrollTop));
         }
 
+        function renderMySpaceNotes() {
+            const list = document.getElementById('my-space-notes-list');
+            const count = document.getElementById('my-space-note-count');
+            if (!list || !count) return;
+
+            const courseOrder = Object.keys(LEARN_COURSES);
+            const records = Object.entries(learnNotes || {}).map(([key, rawNote]) => {
+                const separator = key.lastIndexOf('::');
+                if (separator < 1) return null;
+
+                const courseId = key.slice(0, separator);
+                const lectureIndex = Number(key.slice(separator + 2));
+                const course = LEARN_COURSES[courseId];
+                const noteText = String(rawNote || '').trim();
+                if (!course || !Number.isInteger(lectureIndex) || lectureIndex < 0 || !noteText) return null;
+
+                return { courseId, lectureIndex, courseName: course.name, noteText };
+            }).filter(Boolean).sort((a, b) => {
+                const courseDifference = courseOrder.indexOf(a.courseId) - courseOrder.indexOf(b.courseId);
+                return courseDifference || a.lectureIndex - b.lectureIndex;
+            });
+
+            count.textContent = `${records.length} saved ${records.length === 1 ? 'note' : 'notes'}`;
+
+            if (!records.length) {
+                list.innerHTML = '<div class="my-space-empty">Your lecture notes will appear here.<br>Open Learn, choose a lecture, and save a note to build your space.</div>';
+                return;
+            }
+
+            list.innerHTML = records.map(record => {
+                const title = `Lecture ${String(record.lectureIndex + 1).padStart(2, '0')} · ${record.courseName}`;
+                const preview = record.noteText.length > 260
+                    ? `${record.noteText.slice(0, 260).trimEnd()}…`
+                    : record.noteText;
+
+                return `<article class="my-space-note-card">
+                    <div class="my-space-note-title">${escapeHtml(title)}</div>
+                    <div class="my-space-note-preview">${escapeHtml(preview)}</div>
+                </article>`;
+            }).join('');
+        }
+
+        function openMySpaceModal() {
+            const modal = document.getElementById('my-space-modal');
+            if (!modal) return;
+
+            /* Read the existing local notes store. Google Sheets logging remains
+               untouched; this UI deliberately labels entries by course/lecture,
+               not by the YouTube title. */
+            try {
+                const storedNotes = JSON.parse(localStorage.getItem('circle_v2_learn_notes_v1') || '{}');
+                if (storedNotes && typeof storedNotes === 'object') {
+                    learnNotes = Object.assign({}, storedNotes, learnNotes);
+                }
+            } catch (_) {}
+
+            renderMySpaceNotes();
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeMySpaceModal() {
+            const modal = document.getElementById('my-space-modal');
+            if (!modal) return;
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
         function renderLearnThumbnails() {
             const container = document.getElementById('learn-thumbnails');
             if (!learnPlaylistIds.length) {
-                container.innerHTML = '';
+                container.innerHTML = Array.from({ length: 5 }, () =>
+                    '<div class="learn-thumb-skeleton" aria-hidden="true"></div>'
+                ).join('');
                 return;
             }
 
