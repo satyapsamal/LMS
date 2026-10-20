@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="origin">
     <!-- Page Title -->
-    <title>Circle</title>
+    <title>Circle AI</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -19,13 +19,13 @@
 
     <!-- Open Graph / Social Sharing -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Circle">
+    <meta property="og:title" content="Circle AI">
     <meta property="og:description" content="Your student-led BBA assistant for quick answers, exaam updates, study resources, and academic guidance. Ask Circle AI. Learn faster, understand better.">
     <meta property="og:image" content="https://raw.githubusercontent.com/satyapsamal/circle/main/circle-promo.png">
 
     <!-- Twitter / X Sharing -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Circle">
+    <meta name="twitter:title" content="Circle AI">
     <meta name="twitter:description" content="Your student-led BBA assistant for quick answers, exam updates, study resources, and academic guidance. Ask Circle AI. Learn faster, understand better.">
     <meta name="twitter:image" content="https://raw.githubusercontent.com/satyapsamal/circle/main/circle-promo.png">
     
@@ -773,7 +773,7 @@
             color: #ffffff;
             border-color: rgba(255, 255, 255, 0.3);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
+            transform: none;
         }
 
         /* Input Glow Layering */
@@ -5811,42 +5811,120 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     #ask-utility-buttons {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        gap: 12px;
         width: 100%;
         margin: 0 0 12px;
+        max-height: 140px;
+        overflow: hidden;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        transition: opacity .25s ease, transform .25s ease, max-height .3s ease, margin .3s ease, visibility 0s linear 0s;
+    }
+    body.circle-ask-mode.chat-active #ask-utility-buttons,
+    #ask-utility-buttons.prompt-hidden {
+        max-height: 0;
+        margin-bottom: 0;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(6px);
+        transition: opacity .25s ease, transform .25s ease, max-height .3s ease, margin .3s ease, visibility 0s linear .3s;
     }
     .ask-utility-button {
+        position: relative;
         min-width: 0;
-        display: inline-flex;
+        min-height: 106px;
+        width: 100%;
+        display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 10px 14px;
+        justify-content: flex-start;
+        gap: 15px;
+        padding: 13px 34px 13px 14px;
         border: 1px solid rgba(255,255,255,.12);
         border-radius: 22px;
-        background: rgba(255,255,255,.035);
+        background: linear-gradient(135deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
         color: #dedede;
         box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
         font: 500 13px var(--font-conversational);
-        text-align: center;
+        text-align: left;
         text-decoration: none;
-        white-space: nowrap;
+        white-space: normal;
         cursor: pointer;
         transition: background .2s ease, border-color .2s ease, color .2s ease;
         -webkit-tap-highlight-color: transparent;
     }
     .ask-utility-button:hover {
-        background: rgba(255,255,255,.08);
+        background: linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,255,255,.022));
         border-color: rgba(255,255,255,.24);
         color: #fff;
     }
-    .ask-utility-button svg {
-        width: 16px;
-        height: 16px;
-        flex: 0 0 16px;
+    .ask-utility-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 80px;
+        width: 80px;
+        height: 78px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 15px;
+        background: linear-gradient(145deg, #202832, #101113);
+        color: #d6dce2;
+    }
+    .ask-utility-icon svg {
+        display: block;
+        width: 31px;
+        height: 31px;
+        flex: 0 0 31px;
         fill: none;
         stroke: currentColor;
-        stroke-width: 1.6;
+        stroke-width: 1.35;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    #my-library-btn .ask-utility-icon {
+        color: #fff;
+    }
+    #my-library-btn .ask-utility-icon svg {
+        fill: #fff;
+        stroke: none;
+    }
+    #bba-circle-btn .ask-utility-icon {
+        background: linear-gradient(145deg, #1c3429, #101613);
+        color: #d1ddd5;
+    }
+    .ask-utility-copy {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        min-width: 0;
+    }
+    .ask-utility-title {
+        display: block;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+    .ask-utility-description {
+        display: block;
+        color: #999;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+    }
+    .ask-utility-arrow {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 12px;
+        height: 12px;
+        fill: none;
+        stroke: #8e9aa6;
+        stroke-width: 1.5;
         stroke-linecap: round;
         stroke-linejoin: round;
     }
@@ -5963,6 +6041,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     }
     .circle-library-note-card {
         display: flex;
+        font-family: var(--font-conversational);
         align-items: center;
         gap: 14px;
         width: 100%;
@@ -5994,6 +6073,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     }
     .circle-library-note-preview {
         display: -webkit-box;
+        font-family: var(--font-conversational);
         overflow: hidden;
         margin-top: 5px;
         color: #858585;
@@ -6044,6 +6124,11 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         font: 500 12px var(--font-conversational);
         cursor: pointer;
     }
+    #circle-library-back span:last-child {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+    }
     #circle-library-back:hover { color: #fff; }
     #circle-library-detail-title {
         margin: 0 0 14px;
@@ -6062,8 +6147,13 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     }
     @media (max-width: 480px) {
         #ask-utility-buttons { gap: 8px; margin-bottom: 10px; }
-        .ask-utility-button { gap: 6px; padding: 10px 7px; font-size: 11px; }
-        .ask-utility-button svg { width: 15px; height: 15px; flex-basis: 15px; }
+        .ask-utility-button { min-height: 88px; gap: 8px; padding: 10px 23px 10px 9px; border-radius: 17px; }
+        .ask-utility-icon { flex-basis: 52px; width: 52px; height: 54px; border-radius: 12px; }
+        .ask-utility-icon svg { width: 25px; height: 25px; flex-basis: 25px; }
+        .ask-utility-copy { gap: 4px; }
+        .ask-utility-title { font-size: 12px; }
+        .ask-utility-description { font-size: 10px; line-height: 1.35; }
+        .ask-utility-arrow { top: 10px; right: 9px; width: 10px; height: 10px; }
         #circle-library-modal { padding: 12px; }
         .circle-library-dialog {
             width: 100%;
@@ -6085,13 +6175,13 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         <!-- New User Onboarding Layer -->
         <div id="onboarding-layer" class="hidden">
             <img id="intro-logo" src="circle.png" alt="Circle AI Logo" class="anim-element anim-enter hidden">
-            <h1 id="intro-brand" class="font-ui anim-element anim-enter hidden">Circle.</h1>
+            <h1 id="intro-brand" class="font-ui anim-element anim-enter hidden">Circle AI.</h1>
             <div id="intro-name-step" class="anim-element anim-enter hidden">
                 <div class="profile-onboarding-block">
                     <h1 class="onboarding-introduce-title font-ui">Introduce Yourself.</h1>
 
                     <label id="onboarding-photo-picker" for="onboarding-photo-input" aria-label="Choose profile picture">
-                        <img id="onboarding-photo-preview" src="" alt="Profile picture preview">
+                        <img id="onboarding-photo-preview" alt="">
                         <span id="onboarding-photo-placeholder" aria-hidden="true">
                             <svg class="onboarding-camera-icon" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M8.5 5.5 10 3.5h4l1.5 2H18a3 3 0 0 1 3 3v7.5a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8.5a3 3 0 0 1 3-3h2.5Z"/>
@@ -6110,12 +6200,12 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     <h2 class="onboarding-question font-ui">What should I call you?</h2>
 
                     <div class="name-input-wrapper" id="name-wrapper">
-                        <input type="text" id="name-input" class="font-conversational" placeholder="Your name" autocomplete="name">
+                        <input type="text" id="name-input" class="font-conversational" placeholder="Your name" autocomplete="name" maxlength="70">
                         <button id="name-submit" class="font-ui" aria-label="Continue">→</button>
                     </div>
 
                     <div class="onboarding-name-explanation font-conversational">
-                        Your name helps keep Circle personal, trusted, and safer from impersonation.
+                        Your name helps keep Circle AI personal, trusted, and safer from impersonation.
                     </div>
 
                     <div class="onboarding-encryption-pill font-conversational">
@@ -6125,7 +6215,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                                 <path d="M8 10V7.75a4 4 0 0 1 8 0V10"/>
                             </svg>
                         </span>
-                        <span>Your information stays private. It’s not accessible to anyone, not even Circle.</span>
+                        <span>Your information stays private. It’s not accessible to anyone, not even Circle AI.</span>
                     </div>
 
                     <div id="profile-upload-error" class="font-conversational" style="display:none;color:#ff6666;font-size:11px;margin-top:10px;text-align:center;">Please add a profile picture to continue.</div>
@@ -6164,7 +6254,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     </label>
                 </div>
                 <div class="settings-desc">
-                    Circle AI respects your privacy. Allow your prompts to be saved and used to improve Circle. Turn this off to opt out of prompt storage and training.
+                    Circle AI respects your privacy. Allow your prompts to be saved and used to improve Circle AI. Turn this off to opt out of prompt storage and training.
                 </div>
                 
                 <div class="settings-row" style="margin-top: 24px;">
@@ -6186,7 +6276,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     </select>
                 </div>
                 <div class="settings-desc" style="margin-bottom: 28px;">
-                    Choose your preferred language for learning in Circle.
+                    Choose your preferred language for learning in Circle AI.
                 </div>
 
                 <div class="settings-footer">
@@ -6199,7 +6289,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         <div id="install-modal" class="hidden">
             <div class="settings-content">
                 <div class="settings-header">
-                    <span>Install Circle</span>
+                    <span>Install Circle AI</span>
                     <button id="install-close" class="settings-close" aria-label="Close Install">×</button>
                 </div>
                 
@@ -6222,16 +6312,16 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
              Learn is the default mode on every page load.
              Ask opens the existing Circle AI chat interface.
              ===================================================== -->
-        <header id="app-shell-header" aria-label="Circle navigation">
+        <header id="app-shell-header" aria-label="Circle AI navigation">
             <div class="shell-brand">
-                <button class="shell-brand-main" id="circle-brand-home" type="button" aria-label="Circle home">
+                <button class="shell-brand-main" id="circle-brand-home" type="button" aria-label="Circle AI home">
                     <img src="circle.png" alt="">
-                    <span class="shell-brand-name">Circle</span>
+                    <span class="shell-brand-name">Circle AI</span>
                 </button>
                 <div id="shell-model-slot" class="shell-model-slot" aria-hidden="true"></div>
             </div>
 
-            <div class="shell-mode-switch" role="tablist" aria-label="Circle mode">
+            <div class="shell-mode-switch" role="tablist" aria-label="Circle AI mode">
                 <button id="shell-learn-btn" class="shell-mode-btn active" type="button" role="tab" aria-selected="true">Learn</button>
                 <button id="shell-ask-btn" class="shell-mode-btn" type="button" role="tab" aria-selected="false">Ask</button>
             </div>
@@ -6250,7 +6340,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         <div id="more-menu" aria-hidden="true">
             <button id="more-profile" class="more-profile-item" type="button" aria-label="Open profile">
-                <img id="more-profile-avatar" class="more-profile-avatar" src="" alt="Profile picture">
+                <img id="more-profile-avatar" class="more-profile-avatar" alt="">
                 <span class="more-profile-copy">
                     <span id="more-profile-name" class="more-profile-title">Profile</span>
                     <span class="more-profile-subtitle">View or customise your profile</span>
@@ -6313,7 +6403,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                         <span id="profile-crop-zoom-value">100%</span>
                     </div>
                     <input id="profile-crop-zoom" type="range" min="100" max="260" step="1" value="100" aria-label="Zoom profile picture">
-                    <div class="profile-crop-hint">Your information stays private. It's not accessible to anyone, not even Circle.</div>
+                    <div class="profile-crop-hint">Your information stays private. It's not accessible to anyone, not even Circle AI.</div>
                 </div>
 
                 <div class="profile-crop-actions">
@@ -6330,7 +6420,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     <button id="profile-edit-close" class="profile-modal-close" type="button" aria-label="Close profile">×</button>
                 </div>
                 <label class="profile-edit-photo-label" for="profile-edit-photo-input" aria-label="Change profile picture">
-                    <img id="profile-edit-photo-preview" src="" alt="Profile picture">
+                    <img id="profile-edit-photo-preview" alt="">
                     <span class="profile-edit-photo-overlay" aria-hidden="true">
                         <svg viewBox="0 0 24 24">
                             <path d="M8.5 5.5 10 3.5h4l1.5 2H18a3 3 0 0 1 3 3v7.5a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V8.5a3 3 0 0 1 3-3h2.5Z"/>
@@ -6347,9 +6437,9 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 </label>
                 <div class="profile-edit-field">
                     <label for="profile-edit-name">Name</label>
-                    <input id="profile-edit-name" type="text" maxlength="150" autocomplete="name" placeholder="Your name">
+                    <input id="profile-edit-name" type="text" maxlength="70" autocomplete="name" placeholder="Your name">
                 </div>
-                <div class="profile-edit-note">Your information stays private. It's not accessible to anyone, not even Circle.</div>
+                <div class="profile-edit-note">Your information stays private. It's not accessible to anyone, not even Circle AI.</div>
                 <div class="profile-modal-actions">
                     <button id="profile-edit-cancel" type="button">Cancel</button>
                     <button id="profile-edit-save" type="button">Save changes</button>
@@ -6362,7 +6452,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
              Desktop: My Learnings | Video | Playlist / To-do / Notes
              Mobile: compact progress card | Video | study panel
              ===================================================== -->
-        <section id="learn-layer" aria-label="Circle Learn">
+        <section id="learn-layer" aria-label="Circle AI Learn">
             <div class="learn-shell">
                 <div class="learn-left-column">
                     <aside id="learn-course-sidebar" class="learn-course-sidebar" aria-label="My Learnings">
@@ -6452,7 +6542,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                                     <div class="learn-tool-heading" aria-hidden="true">
                                         <span id="learn-notes-save-status" class="learn-save-status">Saved locally</span>
                                     </div>
-                                    <div class="learn-tool-footnote">Notes are saved in this browser and synced to your Circle Google Sheet.</div>
+                                    <div class="learn-tool-footnote">Notes are saved in this browser and synced to your Circle AI Google Sheet.</div>
                                 </section>
                             </div>
                         </aside>
@@ -6474,8 +6564,8 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     </div>
                 </div>
             </div>
-            <div class="circle-learn-disclaimer" aria-label="Circle attribution">
-                Circle is developed by <a href="https://www.linkedin.com/in/satyaprakashsamal">Satya Prakash Samal</a> as an independent, non-monetary student initiative and is not affiliated with or endorsed by any institution.
+            <div class="circle-learn-disclaimer" aria-label="Circle AI attribution">
+                Circle AI is developed by <a href="https://www.linkedin.com/in/satyaprakashsamal">Satya Prakash Samal</a> as an independent, non-monetary student initiative and is not affiliated with or endorsed by any institution.
             </div>
         </section>
 
@@ -6495,7 +6585,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 </button>
                 <div style="position: relative;">
                     <button id="model-btn" class="floating-btn hidden" aria-label="Select AI model">
-                        <span id="model-btn-label">Circle Core</span>
+                        <span id="model-btn-label">Circle AI Core</span>
                         <span id="model-btn-chevron">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 9.5L12 14.5L17 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </span>
@@ -6503,7 +6593,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     <div id="model-menu">
                         <button class="model-option" data-model="core">
                             <div class="model-option-content">
-                                <span class="model-option-title">Circle Core</span>
+                                <span class="model-option-title">Circle AI Core</span>
                                 <span class="model-option-desc">Balanced responses</span>
                             </div>
                             <div class="model-check">
@@ -6513,7 +6603,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                         <div class="model-divider"></div>
                         <button class="model-option" data-model="swift">
                             <div class="model-option-content">
-                                <span class="model-option-title">Circle Swift <span class="recommended-tag font-conversational">Recommended</span></span>
+                                <span class="model-option-title">Circle AI Swift <span class="recommended-tag font-conversational">Recommended</span></span>
                                 <span class="model-option-desc">Faster responses</span>
                             </div>
                             <div class="model-check">
@@ -6545,13 +6635,22 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             <div id="input-container">
                 <div id="ask-utility-buttons" aria-label="Ask tools">
                     <button type="button" id="my-library-btn" class="ask-utility-button" aria-haspopup="dialog" aria-controls="circle-library-modal">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7A2 2 0 0 1 5 17.5z"/><path d="M5 7h10.5A2.5 2.5 0 0 1 18 9.5M8 11h6M8 14h6"/><path d="M18 7h1a2 2 0 0 1 2 2v10.5H9"/></svg>
-                        <span>My Library</span>
+                        <span class="ask-utility-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5A2.5 2.5 0 0 0 17.5 16H4V5.5Zm0 0V19a2 2 0 0 0 2 2h12.5A1.5 1.5 0 0 0 20 19.5V18H6.5A2.5 2.5 0 0 1 4 15.5V5.5Z"/></svg>
+                        </span>
+                        <span class="ask-utility-copy">
+                            <strong class="ask-utility-title">My Library</strong>
+                            <span class="ask-utility-description">All your lecture notes, in one place.</span>
+                        </span>
                     </button>
                     <a id="bba-circle-btn" class="ask-utility-button" href="https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My" target="_blank" rel="noopener noreferrer">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.5A8.5 8.5 0 1 1 20.5 11.5Z"/><path d="M8.2 8.2c.3-.5.6-.5.9-.5h.4c.2 0 .4.1.5.4l.7 1.6c.1.2.1.4-.1.6l-.5.6c-.2.2-.1.4 0 .6.5.8 1.2 1.5 2 1.9.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.2.1.3.3.3.5 0 .4-.2 1.1-.7 1.5-.5.4-1.2.6-2 .4-1.1-.3-2.4-.9-3.6-2.1-1.3-1.2-2-2.8-2.1-3.6-.1-.7.3-1.3.7-1.7Z"/></svg>
-                        <span>BBA Circle</span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+                        <span class="ask-utility-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 11a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2ZM5.4 12.3a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM18.6 12.3a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM6.4 20c.35-3.2 2.35-5.1 5.6-5.1s5.25 1.9 5.6 5.1M1.8 18.3c.25-2.25 1.5-3.55 3.65-3.8M22.2 18.3c-.25-2.25-1.5-3.55-3.65-3.8"/></svg>
+                        </span>
+                        <span class="ask-utility-copy">
+                            <strong class="ask-utility-title">BBA Circle</strong>
+                            <span class="ask-utility-description">Meet fellow BBA students and study together.</span>
+                        </span>
                     </a>
                 </div>
                 <div id="suggestion-pills">
@@ -6818,10 +6917,10 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         const knowledgeBase = [
             {
                 id: 'what_is_circle',
-                category: 'Circle Tool',
+                category: 'Circle AI Tool',
                 suggestionPool: [
-                    "What is Circle?",
-                    "Who developed Circle?",
+                    "What is Circle AI?",
+                    "Who developed Circle AI?",
                     "what does circle do?",
                     "circle kisne banaya hai?"
                 ],
@@ -6832,28 +6931,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     'circle kisne banaya', 'circle kisne create kiya', 'circle kisne banaya hai', 'circle ka developer kaun hai', 'circle developer kaun hai', 
                     'who created circle', 'who is the developer of circle', 'who built circle', 'circle made by', 'circle developed by'
                 ],
-                markdown: `### What is Circle?\n\n**Circle AI** is a free, 24×7 virtual BBA assistant built specifically for BBA students.\n\nCircle AI is a TOOL made by the **BBA Circle Community**.\n\nIts developer is <a href="https://www.linkedin.com/in/satyaprakashsamal/" target="_blank" rel="noopener noreferrer" style="color: #ffffff; text-decoration: underline; font-weight: bold;">Satya Prakash Samal</a>.\n\nThink of Circle AI as a single place where a student can ask how the BBA Programme works, instead of searching through WhatsApp groups, LMS discussions, emails, and old messages.\n\nCircle AI can help with things such as:\n\n- What to study and what is included in the syllabus\n- Mid-semester and end-semester syllabus\n- Passing marks and examination criteria\n- Assignment and assessment information\n- Important academic deadlines\n- LMS-related information\n- Programme updates and announcements\n- Operational and common BBA queries\n- Study resources and other useful information\n\n**No sign-up. No subscription. Free forever. Available 24×7.**\n\nWebsite:\n[https://shorturl.at/APPeS](https://shorturl.at/APPeS)`
-            },
-            {
-                id: 'founder_circle',
-                category: 'Founder Circle',
-                suggestionPool: [
-                    "What is Founder Circle?",
-                    "How do I apply for Founder Circle?",
-                    "Founder Circle acceptance rate?",
-                    "startup internship Founder Circle"
-                ],
-                keywords: [
-                    'What is Founder Circle', 'what is founder circle', 'Founder Circle kya hai', 'founder circle kya h', 'founder circle community', 
-                    'founder community', 'startup community', 'entrepreneur community', 'entrepreneurship community', 'founders community', 
-                    'builders community', 'aspiring entrepreneurs', 'where can founders connect', 'where can I find startup community', 'startup network', 
-                    'founder network', 'founder circle website', 'founder circle apply', 'how to join founder circle', 'founder circle kaise join kare', 
-                    'founder circle membership', 'founder circle acceptance rate', 'founder circle internship', 'founder circle masterclass', 
-                    'founder circle meetup', 'founder circle opportunities', 'founder circle founders', 'Founder Circle kaise join karu', 
-                    'How do I apply for Founder Circle', 'Founder Circle mein kya milta hai', 'Founder Circle startup community hai kya', 
-                    'Entrepreneurs ke liye koi community hai', 'Where can I connect with student founders'
-                ],
-                markdown: `### Founder Circle\n\n{{Name}}, Founder Circle is a community for:\n\n- Founders\n- Builders\n- Aspiring entrepreneurs\n\nIt is designed to help members:\n\n- Connect\n- Collaborate\n- Validate ideas\n- Learn\n- Build\n- Grow together\n\nFounder Circle is also part of the wider **BBA Circle parent community, "The Circle"**.\n\nTo maintain a focused and high-quality community, prospective members need to complete a short application before joining.\n\nFounder Circle website:\n[https://shorturl.at/fYUCO](https://shorturl.at/fYUCO)\n\nAverage acceptance rate:\n**10%**\n\nMembers can get access to:\n\n- Virtual masterclasses by batchmates building startups\n- Startup internship opportunities\n- In-person meetups across India\n- A network of ambitious students to collaborate, validate ideas, and build together\n\n*Founder Circle is an unofficial, student-led community created to help entrepreneurs and aspiring founders connect. Its discussions, opinions, and activities are independent and are not affiliated with any institution or organization.*`
+                markdown: `### What is Circle AI?\n\n**Circle AI** is a free, 24×7 virtual BBA assistant built specifically for BBA students.\n\nCircle AI is a TOOL made by the **BBA Circle Community**.\n\nIts developer is <a href="https://www.linkedin.com/in/satyaprakashsamal/" target="_blank" rel="noopener noreferrer" style="color: #ffffff; text-decoration: underline; font-weight: bold;">Satya Prakash Samal</a>.\n\nThink of Circle AI as a single place where a student can ask how the BBA Programme works, instead of searching through WhatsApp groups, LMS discussions, emails, and old messages.\n\nCircle AI can help with things such as:\n\n- What to study and what is included in the syllabus\n- Mid-semester and end-semester syllabus\n- Passing marks and examination criteria\n- Assignment and assessment information\n- Important academic deadlines\n- LMS-related information\n- Programme updates and announcements\n- Operational and common BBA queries\n- Study resources and other useful information\n\n**No sign-up. No subscription. Free forever. Available 24×7.**\n\nWebsite:\n[https://shorturl.at/APPeS](https://shorturl.at/APPeS)`
             },
             {
                 id: 'parent_campus_visit',
@@ -6948,7 +7026,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 suggestionPool: [
                     "What is the exam question pattern?",
                     "paper ka pattern kya hai?",
-                    "mid sem mein MCQ honge?",
+                    "end sem mein MCQ honge?",
                     "MCQ aur MSQ dono honge kya?",
                     "exam difficulty kaisi hogi?"
                 ],
@@ -6960,7 +7038,11 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     'mid sem question pattern', 'midterm questions', 'midterm question pattern', 'paper pattern kya hai', 'paper ka pattern kya hai', 
                     'exam ka pattern kya h', 'exam kaise hoga', 'questions ka pattern', 'question ka pattern', 'kitne type ke questions', 'mcq honge kya', 
                     'msq', 'mqs', 'msqs', 'multiple select questions', 'multiple selection questions',
-                    'msq honge kya', 'mcq aur msq', 'mcq msq', 'multiple choice aur multiple selection', 'multiple choice and multiple selection'
+                    'msq honge kya', 'mcq aur msq', 'mcq msq', 'multiple choice aur multiple selection', 'multiple choice and multiple selection',
+                    'end term question pattern', 'end-term question pattern', 'end semester question pattern', 'end sem question pattern',
+                    'end term exam pattern', 'end-term exam pattern', 'end semester exam pattern', 'end sem exam pattern',
+                    'end sem mein mcq honge', 'end sem me mcq honge', 'end term mein mcq honge', 'end term me mcq honge',
+                    'end sem mein msq honge', 'end term mein msq honge', 'end semester difficulty', 'end term difficulty'
                 ],
                 markdown: `### Question Pattern\n\n{{Name}}, the examination will consist of:\n\n- **Multiple Choice Questions (MCQs)**\n- **Multiple Select Questions (MSQs)**\n\nMCQs generally require the student to select the correct option from the choices provided.\n\nMSQs may require the student to select more than one correct option.\n\nThe overall difficulty may range from **Moderate → Hard**.`
             },
@@ -7310,22 +7392,80 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 markdown: `{{Name}}, for the Business Mathematics examination, an on-screen calculator will be available on the computer at the examination centre.`
             },
             {
+                id: 'end_term_syllabus',
+                category: 'End-Term Syllabus',
+                suggestionPool: [
+                    "What is the End-Term syllabus?",
+                    "End-term syllabus kya hai?",
+                    "Which videos are included in End Term?",
+                    "End sem ke videos kaunse hain?",
+                    "End-Term video range for all subjects",
+                    "Business Communication End-Term videos",
+                    "Business Mathematics End-Term videos",
+                    "Computer Applications End-Term videos",
+                    "Marketing and Sales End-Term videos",
+                    "Entrepreneurship Basics End-Term videos",
+                    "BBA111 End-Term syllabus",
+                    "BBA112 End-Term syllabus",
+                    "BBA113 End-Term syllabus",
+                    "BBA114 End-Term syllabus",
+                    "BBA115 End-Term syllabus",
+                    "Where should I watch End-Term videos?",
+                    "End sem mein kya padhna hai?",
+                    "Syllabus for End Semester",
+                    "End term video numbers?",
+                    "End semester portion subject wise"
+                ],
+                keywords: [
+                    'end term', 'end-term', 'endterm', 'end sem', 'end-sem', 'endsem', 'end semester', 'end-semester',
+                    'end term syllabus', 'end-term syllabus', 'endterm syllabus', 'end sem syllabus', 'end-sem syllabus',
+                    'end semester syllabus', 'end-semester syllabus', 'end term portion', 'end sem portion', 'end semester portion',
+                    'end term examination', 'end-term examination', 'end semester examination', 'end sem examination',
+                    'end term exam', 'end-term exam', 'endterm exam', 'end sem exam', 'end semester exam', 'end-sem exam',
+                    'final term exam', 'final semester exam', 'videos included in end term', 'videos included in end-term',
+                    'end term video range', 'end-term video range', 'end term videos', 'end-term videos', 'end sem videos',
+                    'end semester videos', 'end term lecture', 'end sem lecture', 'end semester lecture', 'video numbers for end term',
+                    'video number for end term', 'which videos are included in end term', 'which videos to watch for end term',
+                    'what to study for end term', 'what to study for end semester', 'what is included in end term',
+                    'what comes in end term', 'syllabus for end sem', 'syllabus for end semester', 'end sem me kya padhna hai',
+                    'end sem mein kya padhna hai', 'end term ka syllabus', 'end semester ka syllabus', 'end sem syllabus kya hai',
+                    'end term syllabus kya hai', 'end sem ki tayari', 'end-term ki tayari', 'end semester ki tayari',
+                    'business communication end term', 'business communication end-term', 'business communication end semester',
+                    'business mathematics end term', 'business mathematics end-term', 'business mathematics end semester',
+                    'computer applications end term', 'computer applications end-term', 'computer applications for business end term',
+                    'marketing and sales management end term', 'marketing and sales end term', 'entrepreneurship basics end term',
+                    'bba111 end term', 'bba111 end-term', 'bba111 end semester',
+                    'bba112 end term', 'bba112 end-term', 'bba112 end semester',
+                    'bba113 end term', 'bba113 end-term', 'bba113 end semester',
+                    'bba114 end term', 'bba114 end-term', 'bba114 end semester',
+                    'bba115 end term', 'bba115 end-term', 'bba115 end semester',
+                    '81-tbd', '85-tbd', '93-180', '78-tbd',
+                    'end sem me kya hai', 'end semester me kya hai', 'endterm sylabus', 'end sem sylabus', 'end term syallbus',
+                    'end sem syallbus', 'end term vedios', 'end sem vedios', 'end sem portion kya hai', 'exam syllabus end term'
+                ],
+                markdown: `### End-Term Examination Syllabus
+
+{{Name}}, here is the video coverage included in the End-Term examination for each BBA subject.
+
+**Source:** End-Term video coverage table shared for Circle AI.
+
+<table>
+<thead><tr><th>S. No.</th><th>Subject</th><th>Videos Included in End Term</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>BBA111 – Business Communication</td><td>Video No. 81–TBD</td></tr>
+<tr><td>2</td><td>BBA112 – Business Mathematics</td><td>Video No. 85–TBD</td></tr>
+<tr><td>3</td><td>BBA113 – Computer Applications for Business</td><td>Video No. 85–TBD</td></tr>
+<tr><td>4</td><td>BBA114 – Marketing and Sales Management</td><td>Video No. 93–180</td></tr>
+<tr><td>5</td><td>BBA115 – Entrepreneurship Basics</td><td>Video No. 78–TBD</td></tr>
+</tbody>
+</table>
+
+You can watch the relevant video lectures in **Circle AI → Learn** by selecting the subject. Ranges marked **TBD** have not yet been confirmed in the supplied table.`
+            },
+            {
                 id: 'mid_term_syllabus',
                 category: 'Mid-Term Syllabus',
-                suggestionPool: [
-                    "What is the Mid-Term syllabus?",
-                    "Mid-Term syllabus kya hai?",
-                    "Mid sem mein kya padhna hai?",
-                    "Mid sem ke videos kaha hain?",
-                    "Where are the Mid-Term playlists?",
-                    "Business Communication Mid-Term videos",
-                    "Business Mathematics Mid-Term videos",
-                    "Computer Applications Mid-Term videos",
-                    "Marketing and Sales Mid-Term videos",
-                    "Entrepreneurship Basics Mid-Term videos",
-                    "Mid sem playlist kahan hai?",
-                    "Midterm ki preparation ke liye videos kaha hain?"
-                ],
+                suggestionPool: [],
                 keywords: [
                     'mid term', 'mid-term', 'midterm', 'mid sem', 'mid-sem', 'mid sem syllabus', 'mid-sem syllabus', 
                     'midterm syllabus', 'mid term syllabus', 'mid term portion', 'midterm portion', 'mid sem portion', 
@@ -7348,7 +7488,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     'midterm poriton', 'midterm porton', 'mid sem vedios', 'mid term vedios', 'midsem vedio', 'midterm vidoes', 
                     'mid sem lecture', 'midsem lecutres', 'mid sem plalist', 'midterm plalist', 'portions', '13 september', 'exam syllabus'
                 ],
-                markdown: `### Mid-Term Examination Syllabus\n\n{{Name}}, here’s the current **Mid-Term syllabus**, subject by subject.\n\nThe following playlists contain the available video lectures relevant to the Mid-Term preparation.\n\n### Business Communication\n\n**Videos uploaded:** 1–80\n\n[Watch the Business Communication playlist →](https://youtube.com/playlist?list=PLO6lKmVH-LHc&si=Fueo6s_1gvNdXSjU)\n\n### Business Mathematics\n\n**Videos uploaded:** 1–84\n\n[Watch the Business Mathematics playlist →](https://youtube.com/playlist?list=PL59tH4pjx8SALcAYjbujfMUwAI4S9Cx9c&si=BFPR6-SGkhXkdx8D)\n\n### Computer Applications for Business\n\n**Videos uploaded:** 1–84\n\n[Watch the Computer Applications playlist →](https://youtube.com/playlist?list=PL59tH4pjx8SCk7LmDwxbmiYXrwn4DaZZm&si=Fa3zKY4xWgzYWP-5)\n\n### Marketing and Sales Management\n\n**Videos uploaded:** 1–92\n\n[Watch the Marketing and Sales Management playlist →](https://youtube.com/playlist?list=PL59tH4pjx8SCqngJcM7uWg81BnOXiuaNM&si=Ub0UqIAqkdYzliPQ)\n\n### Entrepreneurship Basics\n\n**Videos uploaded:** 1–77\n\n[Watch the Entrepreneurship Basics playlist →](https://youtube.com/playlist?list=PL59tH4pjx8SB2v1pdapHJcxcGq-Mj4r4-&si=6HkLwbhlIB9YeiU1)\n\n---\n\nFor **handbooks, practice assignments, PPTs, and other LMS resources**, simply ask Circle AI.`
+                markdown: `### Mid-Term Examination Syllabus\n\n{{Name}}, the Mid-Term examination has concluded.\n\nFor subject video lectures, you can still open **Circle AI → Learn** and select the relevant course. The videos are available within Circle AI, so you do not need a separate YouTube playlist link.`
             },
             {
                 id: 'material_pages_to_study',
@@ -7410,21 +7550,6 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 markdown: `Well {{Name}}, BBA Circle is a community for BBA students to learn, connect, collaborate, and grow together.\n\nBenefits include:\n- Academic discussions and peer-to-peer learning\n- Crash courses and revision sessions by students\n- Masterclasses and learning sessions led by entrepreneurs\n- Study resources, notes, and useful materials\n- Discussions around assignments and examinations\n- Opportunities to teach, learn, and collaborate\n\n**Peer-Led Crash Courses:**\nFrom 6 September to 10 September, students interested in teaching can volunteer to conduct crash course sessions and help their peers while revising their own syllabus.\n\nBBA Circle handles coordination, moderation, and promotion. The community is entirely student-led.`,
                 sources: [
                     { label: 'Join BBA Circle WhatsApp →', url: 'https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My' }
-                ]
-            },
-            {
-                id: 'backlogs_syllabus_completion',
-                category: 'Backlogs',
-                suggestionPool: [
-                    "How to cover my backlog?",
-                    "How can I finish my syllabus quickly?",
-                    "missed class cover kaise karu?",
-                    "syllabus completion strategy"
-                ],
-                keywords: ['backlog', 'missed class', 'complete syllabus', 'how to cover', 'cover syllabus'],
-                markdown: `If you are trying to cover backlogs or complete the syllabus, {{Name}}, your primary focus should be preparing all the material uploaded to the Drive/LMS by the 31 August cutoff.\n\nAdditionally, **Peer-Led Crash Courses** are being organized within the BBA Circle community from 6 September to 10 September. These are highly recommended for revising and catching up on missed concepts with the help of your peers.`,
-                sources: [
-                    { label: 'Join BBA Circle for Revision Sessions →', url: 'https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My' }
                 ]
             },
             {
@@ -7518,6 +7643,10 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         });
 
         const availableCategories = Object.keys(categorizedSuggestions);
+        // Prioritise current End-Term syllabus prompts in the random carousel.
+        const weightedSuggestionCategories = availableCategories.flatMap(category =>
+            category === 'End-Term Syllabus' ? [category, category, category] : [category]
+        );
         
         let lastCategory = null;
         let recentPrompts = [];
@@ -7528,7 +7657,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 let cat;
                 // Choose a random category different from the last one
                 do {
-                    cat = availableCategories[Math.floor(Math.random() * availableCategories.length)];
+                    cat = weightedSuggestionCategories[Math.floor(Math.random() * weightedSuggestionCategories.length)];
                 } while (cat === lastCategory && availableCategories.length > 1);
                 
                 lastCategory = cat;
@@ -8020,11 +8149,35 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             setupEventListeners();
             setupCircleLibraryUI();
 
-            if (isRegistered && userName && profilePhotoDataUrl) {
-                setTimeout(showProfileReminder, 4200);
-                startMainInterface().then(() => {
-                    switchCircleMode('learn');
-                    setTimeout(showReturningMotivationToast, 750);
+            if (isRegistered === 'true' && userName && profilePhotoDataUrl) {
+                /* Re-check stored profiles at startup. Invalid profiles return to
+                   onboarding, while learning progress and notes remain untouched. */
+                Promise.all([
+                    Promise.resolve(validateCircleDisplayName(userName)),
+                    ensureProfilePhotoIsSuitable(profilePhotoDataUrl).catch(() => ({ valid: false, reason: 'validation-failed' }))
+                ]).then(([nameValidation, photoValidation]) => {
+                    if (nameValidation.valid && photoValidation.valid) {
+                        setTimeout(showProfileReminder, 4200);
+                        startMainInterface().then(() => {
+                            switchCircleMode('learn');
+                            setTimeout(showReturningMotivationToast, 750);
+                        });
+                        return;
+                    }
+
+                    localStorage.removeItem('circle_v2_user_registered');
+                    circleReturningUser = false;
+                    if (!photoValidation.valid) {
+                        profilePhotoDataUrl = '';
+                        localStorage.removeItem('circle_v2_profile_photo_data_url');
+                    }
+                    startOnboardingSequence();
+                }).catch(() => {
+                    localStorage.removeItem('circle_v2_user_registered');
+                    circleReturningUser = false;
+                    profilePhotoDataUrl = '';
+                    localStorage.removeItem('circle_v2_profile_photo_data_url');
+                    startOnboardingSequence();
                 });
             } else {
                 startOnboardingSequence();
@@ -8035,7 +8188,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         function selectModelUI(modelVal) {
             const btnLabel = document.getElementById('model-btn-label');
             if (btnLabel) {
-                btnLabel.textContent = modelVal === 'swift' ? 'Circle Swift' : 'Circle Core';
+                btnLabel.textContent = modelVal === 'swift' ? 'Circle AI Swift' : 'Circle AI Core';
             }
             const opts = document.querySelectorAll('.model-option');
             opts.forEach(opt => opt.classList.remove('selected'));
@@ -8054,7 +8207,20 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             const brand = document.getElementById('intro-brand');
             const nameStep = document.getElementById('intro-name-step');
             const nameInput = document.getElementById('name-input');
-            
+            const photoPreview = document.getElementById('onboarding-photo-preview');
+            const photoPicker = document.getElementById('onboarding-photo-picker');
+            const photoError = document.getElementById('profile-upload-error');
+
+            /* Preserve an existing name/photo for correction when possible. */
+            if (nameInput && userName && !nameInput.value) nameInput.value = userName;
+            if (profilePhotoDataUrl) {
+                if (photoPreview) photoPreview.src = profilePhotoDataUrl;
+                if (photoPicker) photoPicker.classList.add('has-photo');
+                if (photoError) photoError.style.display = 'none';
+            } else {
+                if (photoPreview) photoPreview.removeAttribute('src');
+                if (photoPicker) photoPicker.classList.remove('has-photo');
+            }
             layer.classList.remove('hidden');
 
             logo.classList.remove('hidden');
@@ -8083,12 +8249,123 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             document.getElementById('name-input').focus();
         }
 
+        function validateCircleDisplayName(rawValue) {
+            const normalized = String(rawValue == null ? '' : rawValue)
+                .normalize('NFKC')
+                .trim()
+                .replace(/\s+/g, ' ');
+            const fail = () => ({
+                valid: false,
+                normalized,
+                message: 'Let’s keep it real. Please use your real name 🫶'
+            });
+
+            if (normalized.length > 70) return fail();
+            /* Letters, combining marks (needed by Indic scripts), and plain spaces only. */
+            if (!/^[\p{L}\p{M} ]+$/u.test(normalized)) return fail();
+            /* Require at least three alphabetic characters total, not three words. */
+            const alphabeticCharacterCount = (normalized.match(/\p{L}/gu) || []).length;
+            if (alphabeticCharacterCount < 3) return fail();
+
+            const words = normalized.split(' ');
+
+            const normalizeWord = word => word
+                .normalize('NFKD')
+                .replace(/\p{M}/gu, '')
+                .toLocaleLowerCase();
+            const normalizedWords = words.map(normalizeWord);
+            const compactName = normalizedWords.join('');
+
+            /* Common placeholders, keyboard patterns, and abusive terms in English,
+               Hindi transliteration, and Devanagari. This is a practical local list,
+               not a claim of exhaustive language coverage. */
+            const blockedWords = new Set([
+                'xyz','xxx','xx','abc','abcd','abcde','abcdef','asd','asdf','asdfgh','qwe','qwer','qwerty',
+                'zxc','zxcv','zxcvbn','mnbv','poiuy','lkjh','hgfds','test','testing','demo','sample','user',
+                'username','name','student','admin','guest','anonymous','unknown','nobody','none','noname',
+                'null','undefined','random','fake','dummy','person','fullname','first','last','aaaa','bbbb',
+                'fuck','fucks','fucked','fucker','fuckers','fucking','motherfucker','motherfuckers','fuckboy',
+                'shit','shits','shitty','bullshit','shithead','shitface','bitch','bitches','bitchy','bitchboy',
+                'bastard','bastards','asshole','assholes','arsehole','dick','dickhead','cock','cocksucker',
+                'pussy','pussies','cunt','cunts','slut','sluts','whore','whores','twat','wanker','jerkoff',
+                'motherless','nigger','nigga','retard','retarded','rape','rapist','porn','pornstar',
+                'damn','dammit','crap','piss','pissed','pissoff','hell','bullcrap','douche','douchebag',
+                'fuckwit','fuckface','fuckhead','shitface','dipshit','jackass','dumbass','asswipe','arse',
+                'madarchod','madarchodh','madarchoot','maderchod','madarchoda','madarchodaa','madarchud',
+                'madarchood','mc','mch','behenchod','bhenchod','bahenchod','bahan chod','bahinchod',
+                'behnchod','bhench*d','bc','bch','chutiya','chutia','chutiye','chutiyapa','chut','choot',
+                'chootiya','gaand','gand','gaandu','gandu','gaanduu','gaandfaad','lund','lauda','lawda',
+                'lavda','lavde','laude','bhosdi','bhosdike','bhosda','bhosdika','bhosadike','bhosdike',
+                'randi','randwa','harami','haraami','kamina','kamine','kamini','saala','saali','suar',
+                'kutti','kuttiya','bhadwa','bhadwe','jhant','jhaant','chod','chodu','chodan','teri ma','teri maa',
+                'anonymous','unknown','legend','official','gamer','gaming','player','proplayer','batman',
+                'superman','spiderman','ironman','joker','naruto','goku','saitama','pikachu','sherlock',
+                'deadpool','mrbeast','youtube','tiktok','instagram','influencer','creator','sigma','alpha',
+                'beta','omega','fakeaccount','notreal',
+                'चूतिया','चूतियाप','चूत','मादरचोद','मदरचोद','मादरचूत','बहनचोद','भेनचोद','बहिनचोद',
+                'भोसड़ी','भोसड़ीके','भोसडी','भोसड़ीवाले','गांडू','गांड','गाण्डू','लंड','लौड़ा','लवड़ा',
+                'रंडी','हरामी','कमीना','कमिनी','साला','साली','भड़वा','भड़वे','झांट','चोद','चोदू','गाली',
+                'महा चूतिया','हरामखोर','कुतिया','सूअर','बकचोद','बकचोदी','चूतड़','गांडमार'
+            ]);
+            const placeholderWords = new Set([
+                'xyz','xxx','abc','abcd','asdf','asdfgh','qwerty','zxcv','test','testing','demo','sample',
+                'admin','guest','anonymous','unknown','nobody','none','noname','null','undefined','random',
+                'fake','dummy','student','user','username','name','aaaa','bbbb','abcded','legend','official',
+                'gamer','gaming','player','batman','superman','spiderman','ironman','joker','naruto','goku',
+                'saitama','pikachu','sherlock','deadpool','mrbeast','youtube','tiktok','instagram','sigma',
+                'alpha','beta','omega','creator','influencer','notreal'
+            ]);
+            const normalizedBlockedWords = new Set([...blockedWords].map(normalizeWord));
+            const normalizedPlaceholders = new Set([...placeholderWords].map(normalizeWord));
+            const collapseRepeatedLetters = word => word.replace(/(.)\1+/gu, '$1');
+            const blockedPatterns = [
+                /^(?:f+u+c+k+|f+u+k+|p+h+u+c+k+|s+h+i+t+|b+i+t+c+h+|c+u+n+t+|a+s+s+h+o+l+e+|d+i+c+k+h+e+a+d+)$/i,
+                /^(?:m+a+d+a+r+c+h+o+d+h*|m+a+d+e+r+c+h+o+d+h*|b+h+e+n+c+h+o+d+h*|b+a+h+e+n+c+h+o+d+h*|c+h+u+t+i+y+[ae]?|g+a+a+n+d+u+|g+a+n+d+u+|l+a+u+d+a+|l+a+v+d+a+|l+u+n+d+|r+a+n+d+i+|h+a+r+a+m+i+|k+a+m+i+n+[ae]?)$/i
+            ];
+            if (normalizedWords.some(word => {
+                const collapsed = collapseRepeatedLetters(word);
+                return normalizedBlockedWords.has(word) || normalizedBlockedWords.has(collapsed) ||
+                    normalizedPlaceholders.has(word) || normalizedPlaceholders.has(collapsed) ||
+                    blockedPatterns.some(pattern => pattern.test(collapsed));
+            })) return fail();
+
+            /* Catch common keyboard runs, repeated patterns, and repeated words. */
+            const keyboardPattern = /(?:qwerty|asdf|zxcv|mnbv|poiuy|lkjh|hgfds|abcdef|zyxwv|qazwsx)/i;
+            if (keyboardPattern.test(compactName) || /(.)\1{2,}/u.test(normalized) ||
+                new Set(normalizedWords).size !== normalizedWords.length) return fail();
+
+            /* Reject obvious gibberish in Latin-script tokens, while leaving names
+               written in Hindi and other scripts to Unicode-safe checks above. */
+            for (const word of normalizedWords) {
+                if (!/^[a-z]+$/i.test(word)) continue;
+                if (word.length >= 4) {
+                    if (!/[aeiouy]/i.test(word)) return fail();
+                    let consonantRun = 0;
+                    let maximumConsonantRun = 0;
+                    for (const character of word) {
+                        if (/[aeiouy]/i.test(character)) consonantRun = 0;
+                        else {
+                            consonantRun += 1;
+                            maximumConsonantRun = Math.max(maximumConsonantRun, consonantRun);
+                        }
+                    }
+                    if (maximumConsonantRun > 3) return fail();
+                    if (/([a-z]{2,})\1{1,}/i.test(word)) return fail();
+                }
+            }
+
+            /* Word count is intentionally unrestricted. The three-letter minimum is
+               checked above, while spam, placeholder, profanity, and gibberish checks remain. */
+            return { valid: true, normalized, message: '' };
+        }
+
         async function submitName() {
             const nameInput = document.getElementById('name-input');
             const wrapper = document.getElementById('name-wrapper');
             const photoPicker = document.getElementById('onboarding-photo-picker');
             const photoError = document.getElementById('profile-upload-error');
-            const nameVal = nameInput.value.trim();
+            const nameValidation = validateCircleDisplayName(nameInput.value);
+            const nameVal = nameValidation.normalized;
 
             let valid = true;
 
@@ -8101,9 +8378,11 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 photoError.style.display = 'none';
             }
 
-            if (!nameVal) {
+            if (!nameValidation.valid) {
                 wrapper.style.borderColor = '#ff4444';
                 setTimeout(() => wrapper.style.borderColor = 'rgba(255,255,255,0.3)', 1500);
+                showToast(nameValidation.message, 4500);
+                nameInput.focus();
                 valid = false;
             }
 
@@ -8114,6 +8393,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             localStorage.setItem('circle_v2_user_id', circleUserId);
             localStorage.setItem('circle_v2_profile_photo_data_url', profilePhotoDataUrl);
             userName = nameVal;
+            refreshMoreProfileUI();
 
             /*
              * This is intentionally non-blocking: a slow/failed analytics or
@@ -8138,7 +8418,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             await sleep(1200);
             nameStep.classList.add('hidden');
 
-            welcome.textContent = formatText("Welcome to Circle, {{Name}}.", userName);
+            welcome.textContent = formatText("Welcome to Circle AI, {{Name}}.", userName);
             welcome.classList.remove('hidden');
             await sleep(50);
             welcome.classList.remove('anim-enter');
@@ -8484,7 +8764,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 : '';
 
             if (!displayName) {
-                if (raw === 'Please enter your name.') return 'Tell Circle your name to continue.';
+                if (raw === 'Please enter your name.') return 'Tell Circle AI your name to continue.';
                 return raw;
             }
 
@@ -8492,13 +8772,13 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 'Please choose JPG, PNG or WEBP.': `Please choose a JPG, PNG, or WEBP, ${displayName}.`,
                 'Could not process that picture. Try another image.': `That picture couldn’t be processed, ${displayName}. Try another one.`,
                 'Could not process that picture.': `That picture couldn’t be processed, ${displayName}. Try another one.`,
-                'Share text copied': `Your Circle share text is copied, ${displayName}.`,
-                'Please enter your name.': `Tell Circle your name to continue, ${displayName}.`,
-                'Profile updated.': `Your Circle profile is updated, ${displayName} 🫶`,
+                'Share text copied': `Your Circle AI share text is copied, ${displayName}.`,
+                'Please enter your name.': `Tell Circle AI your name to continue, ${displayName}.`,
+                'Profile updated.': `Your Circle AI profile is updated, ${displayName} 🫶`,
                 'Press play to start the lesson.': `Your lesson is ready, ${displayName}. Tap play whenever you’re ready.`,
-                'This YouTube video does not allow embedded playback.': `This lecture can’t play inside Circle right now, ${displayName}. Try another one.`,
+                'This YouTube video does not allow embedded playback.': `This lecture can’t play inside Circle AI right now, ${displayName}. Try another one.`,
                 'This YouTube video is unavailable or private.': `This lecture isn’t available right now, ${displayName}. Let’s try another one.`,
-                'YouTube blocked the embed request. The player is retrying with the required referrer.': `Circle is reconnecting to this lecture, ${displayName}. Give it a moment.`,
+                'YouTube blocked the embed request. The player is retrying with the required referrer.': `Circle AI is reconnecting to this lecture, ${displayName}. Give it a moment.`,
                 'This lesson could not be loaded.': `We couldn’t load this lecture, ${displayName}. Let’s try again.`,
                 'YouTube could not load this lesson.': `YouTube couldn’t load this lecture, ${displayName}. Try again in a moment.`
             };
@@ -8558,14 +8838,19 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             const avatar = document.getElementById('more-profile-avatar');
             const name = document.getElementById('more-profile-name');
             if (name) name.textContent = userName || 'Profile';
-            if (avatar) {
-                if (profilePhotoDataUrl) {
-                    avatar.src = profilePhotoDataUrl;
-                    avatar.style.display = 'block';
-                } else {
-                    avatar.removeAttribute('src');
-                    avatar.style.display = 'block';
-                }
+            if (!avatar) return;
+
+            /* Do not leave a broken-image icon if no saved photo exists yet or a stored URL is invalid. */
+            avatar.onerror = () => {
+                avatar.removeAttribute('src');
+                avatar.style.display = 'block';
+            };
+            if (profilePhotoDataUrl) {
+                avatar.src = profilePhotoDataUrl;
+                avatar.style.display = 'block';
+            } else {
+                avatar.removeAttribute('src');
+                avatar.style.display = 'block';
             }
         }
 
@@ -8622,7 +8907,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             canvas.height = sampleSize;
 
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            if (!ctx) return { valid: true, reason: 'validation-unavailable' };
+            if (!ctx) return { valid: false, reason: 'validation-unavailable' };
 
             ctx.drawImage(image, 0, 0, sampleSize, sampleSize);
 
@@ -8630,7 +8915,10 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             const totalPixels = pixels.length / 4;
 
             let luminanceSum = 0;
+            let luminanceSquareSum = 0;
             let darkPixels = 0;
+            let brightPixels = 0;
+            let nearWhitePixels = 0;
 
             for (let i = 0; i < pixels.length; i += 4) {
                 const r = pixels[i];
@@ -8639,22 +8927,35 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
                 const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
                 luminanceSum += luminance;
+                luminanceSquareSum += luminance * luminance;
 
                 if (luminance < 55) darkPixels += 1;
+                if (luminance >= 245) brightPixels += 1;
+                if (r >= 242 && g >= 242 && b >= 242) nearWhitePixels += 1;
             }
 
             const averageLuminance = luminanceSum / totalPixels;
             const darkPixelRatio = darkPixels / totalPixels;
+            const brightPixelRatio = brightPixels / totalPixels;
+            const nearWhitePixelRatio = nearWhitePixels / totalPixels;
+            const luminanceVariance = Math.max(0, luminanceSquareSum / totalPixels - averageLuminance * averageLuminance);
+            const luminanceStdDev = Math.sqrt(luminanceVariance);
 
-            /* Only reject images that are genuinely solid-black or mostly dark.
-               Normal photos with dark backgrounds/shadows should still pass. */
+            /* Reject solid/mostly dark, solid/mostly white, and nearly featureless images.
+               A bright background alone should pass when the photo still has meaningful detail. */
             const mostlyDark =
                 averageLuminance < 36 ||
                 (averageLuminance < 48 && darkPixelRatio >= 0.82);
+            const mostlyWhite =
+                averageLuminance >= 249 ||
+                nearWhitePixelRatio >= 0.985 ||
+                (averageLuminance >= 238 && brightPixelRatio >= 0.96 && nearWhitePixelRatio >= 0.90);
+            const lowDetail = luminanceStdDev < 7.5;
+            const invalidReason = mostlyDark ? 'mostly-dark' : (mostlyWhite ? 'mostly-white' : (lowDetail ? 'low-detail' : 'ok'));
 
             return {
-                valid: !mostlyDark,
-                reason: mostlyDark ? 'mostly-dark' : 'ok'
+                valid: invalidReason === 'ok',
+                reason: invalidReason
             };
         }
 
@@ -8907,9 +9208,10 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         function saveEditedProfile() {
             const nameInput = document.getElementById('profile-edit-name');
-            const nextName = String(nameInput?.value || '').trim();
-            if (!nextName) {
-                showToast('Please enter your name.');
+            const nameValidation = validateCircleDisplayName(nameInput?.value || '');
+            const nextName = nameValidation.normalized;
+            if (!nameValidation.valid) {
+                showToast(nameValidation.message, 4500);
                 nameInput?.focus();
                 return;
             }
@@ -9153,6 +9455,10 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             const chatInput = document.getElementById('chat-input');
             const chatSubmit = document.getElementById('chat-submit');
             const newChatBtn = document.getElementById('new-chat-btn');
+            if (chatInput) {
+                chatInput.addEventListener('input', syncAskUtilityVisibility);
+                syncAskUtilityVisibility();
+            }
             const promoCloseBtn = document.getElementById('promo-close');
             
             const settingsBtn = document.getElementById('settings-btn');
@@ -9297,29 +9603,11 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 }
             }, { passive: false });
 
-            // Infinite scroll trigger dynamically tied to scroll event
-            let isProgrammaticScroll = false;
-
+            // Infinite suggestions load only at the right edge. The left edge
+            // remains the beginning of the carousel and does not prepend items.
             pillsContainer.addEventListener('scroll', () => {
-                if (isProgrammaticScroll) return;
-
-                // Load more on the right
                 if (pillsContainer.scrollWidth - pillsContainer.clientWidth - pillsContainer.scrollLeft < 300) {
                     loadMoreSuggestions(pillsContainer, 'append');
-                }
-
-                // Load more on the left
-                if (pillsContainer.scrollLeft < 50) {
-                    isProgrammaticScroll = true;
-                    const oldScrollWidth = pillsContainer.scrollWidth;
-                    
-                    loadMoreSuggestions(pillsContainer, 'prepend');
-                    
-                    const newScrollWidth = pillsContainer.scrollWidth;
-                    // Adjust scroll to maintain position seamlessly without visual jump
-                    pillsContainer.scrollLeft += (newScrollWidth - oldScrollWidth);
-                    
-                    setTimeout(() => { isProgrammaticScroll = false; }, 20);
                 }
             });
         }
@@ -9386,6 +9674,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             
             const chatInput = document.getElementById('chat-input');
             chatInput.value = '';
+            syncAskUtilityVisibility();
             
             document.getElementById('glow-spinner-elem').classList.add('glow-spinner-reset');
             
@@ -9414,6 +9703,14 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         /*******************************************************
          * 9. CHAT INTERACTION LOGIC
          *******************************************************/
+        function syncAskUtilityVisibility() {
+            const utilityButtons = document.getElementById('ask-utility-buttons');
+            const chatInput = document.getElementById('chat-input');
+            if (!utilityButtons) return;
+            const hasPrompt = Boolean(isChatMode || (chatInput && chatInput.value.trim()));
+            utilityButtons.classList.toggle('prompt-hidden', hasPrompt);
+        }
+
         async function handleChatSubmission() {
             if (isProcessing) return;
             
@@ -9450,13 +9747,6 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 }, 1500); 
             }
 
-            const pills = document.getElementById('suggestion-pills');
-            if (pills && !pills.classList.contains('hidden')) {
-                pills.style.opacity = '0';
-                pills.style.transform = 'translateY(6px)';
-                setTimeout(() => pills.classList.add('hidden'), 600);
-            }
-
             if (!isChatMode) {
                 document.body.classList.add('chat-active');
                 document.getElementById('glow-spinner-elem').classList.remove('glow-spinner-reset');
@@ -9468,6 +9758,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 isChatMode = true;
                 document.getElementById('app-new-chat-btn').classList.add('visible');
             }
+            syncAskUtilityVisibility();
             
             logAskPromptToGoogleSheets(query);
             
@@ -9610,7 +9901,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             
             const modelCapsule = document.createElement('div');
             modelCapsule.className = 'meta-capsule';
-            const modelLabel = (modelUsed === 'swift') ? 'Circle Swift' : 'Circle Core';
+            const modelLabel = (modelUsed === 'swift') ? 'Circle AI Swift' : 'Circle AI Core';
             modelCapsule.textContent = modelLabel;
             
             const timeCapsule = document.createElement('div');
@@ -9682,13 +9973,6 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             container.appendChild(dot);
             scrollToBottom();
             
-            const pills = document.getElementById('suggestion-pills');
-            if (pills && !pills.classList.contains('hidden')) {
-                pills.style.opacity = '0';
-                pills.style.transform = 'translateY(6px)';
-                setTimeout(() => pills.classList.add('hidden'), 600);
-            }
-
             await sleep(1000); 
             
             dot.remove(); 
@@ -10002,7 +10286,7 @@ setInterval(() => {
             host.innerHTML = '';
             const iframe = document.createElement('iframe');
             iframe.id = 'learn-youtube-iframe';
-            iframe.title = 'Circle Learn video player';
+            iframe.title = 'Circle AI Learn video player';
             iframe.src = buildLearnPlaylistEmbedUrl(courseId, startSeconds);
             iframe.width = '100%';
             iframe.height = '100%';
