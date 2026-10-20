@@ -5805,268 +5805,277 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 </style>
 
 
-<style id="circle-skeleton-and-ask-space-ui">
-/* Learn video skeleton: one continuous left-to-right sheen over the 16:9 preview. */
-#learn-loading.learn-loading {
-    align-items: stretch;
-    justify-content: stretch;
-    background: #070707;
-    overflow: hidden;
-}
-.learn-video-skeleton {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    background: #090909;
-    isolation: isolate;
-}
-.learn-video-skeleton::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 34%;
-    z-index: 5;
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.035) 24%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.035) 76%, transparent 100%);
-    transform: translate3d(-120%, 0, 0);
-    will-change: transform;
-    animation: circleSkeletonSweep 1.45s linear infinite;
-}
-/* Keep the preview a clean, fake 16:9 placeholder instead of showing static fake controls. */
-.learn-video-skeleton-header,
-.learn-video-skeleton-main,
-.learn-video-skeleton-meta,
-.learn-video-skeleton-progress {
-    display: none !important;
-}
-@keyframes circleSkeletonSweep {
-    from { transform: translate3d(-120%, 0, 0); }
-    to { transform: translate3d(360%, 0, 0); }
-}
 
-/* Playlist placeholders use the actual thumbnail dimensions and the same moving sheen. */
-.learn-thumb-skeleton {
-    position: relative;
-    display: block;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    margin: 0 0 8px;
-    border: 1px solid rgba(255,255,255,.045);
-    border-radius: 11px;
-    overflow: hidden;
-    background: #0b0b0b;
-}
-.learn-thumb-skeleton:last-child { margin-bottom: 0; }
-.learn-thumb-skeleton::before,
-.learn-thumb.is-loading::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 38%;
-    border-radius: inherit;
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.035) 24%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.035) 76%, transparent 100%);
-    transform: translate3d(-120%, 0, 0);
-    will-change: transform;
-    animation: circleSkeletonSweep 1.45s linear infinite;
-    z-index: 2;
-}
-.learn-thumb-skeleton::after { display: none; }
-.learn-thumb.is-loading {
-    background: #0b0b0b !important;
-}
-.learn-thumb.is-loading img {
-    opacity: 0 !important;
-}
-.learn-thumb:not(.is-loading):not(.completed) img {
-    opacity: 1;
-    transition: opacity .16s ease;
-}
-.learn-thumb.completed:not(.is-loading) img {
-    opacity: .62;
-    transition: opacity .16s ease;
-}
-.learn-thumb.image-unavailable {
-    background: #101010 !important;
-}
-.learn-thumb.image-unavailable img { opacity: 0 !important; }
-.learn-thumb.image-unavailable::before { display: none; }
+<style>
+    /* Ask utilities + My Library modal (scoped additions) */
+    #ask-utility-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+        margin: 0 0 12px;
+    }
+    .ask-utility-button {
+        min-width: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 22px;
+        background: rgba(255,255,255,.035);
+        color: #dedede;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+        font: 500 13px var(--font-conversational);
+        text-align: center;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background .2s ease, border-color .2s ease, color .2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .ask-utility-button:hover {
+        background: rgba(255,255,255,.08);
+        border-color: rgba(255,255,255,.24);
+        color: #fff;
+    }
+    .ask-utility-button svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
 
-/* Ask landing-page cards. The carousel disappears naturally while a chat is active. */
-#ask-feature-carousel.ask-feature-carousel {
-    width: 100%;
-    display: flex;
-    align-items: stretch;
-    gap: 10px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    margin: 0 0 12px;
-    padding: 1px 2px 5px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-snap-type: x proximity;
-    overscroll-behavior-x: contain;
-}
-#ask-feature-carousel::-webkit-scrollbar { display: none; }
-.ask-feature-card {
-    position: relative;
-    display: flex;
-    flex: 1 0 calc(50% - 5px);
-    min-width: 255px;
-    min-height: 86px;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 30px 11px 11px;
-    border: 1px solid rgba(255,255,255,.105);
-    border-radius: 17px;
-    background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
-    color: #f3f3f3;
-    text-decoration: none;
-    text-align: left;
-    cursor: pointer;
-    scroll-snap-align: start;
-    transition: background .2s ease, border-color .2s ease, transform .2s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-.ask-feature-card:hover {
-    background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-    border-color: rgba(255,255,255,.2);
-    transform: translateY(-1px);
-}
-.ask-feature-visual {
-    width: 64px;
-    height: 62px;
-    flex: 0 0 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255,255,255,.10);
-    border-radius: 12px;
-    overflow: hidden;
-}
-.ask-feature-visual svg { width: 43px; height: 43px; display: block; }
-.ask-feature-visual-space { background: radial-gradient(circle at 30% 20%, rgba(147,171,204,.20), transparent 60%), linear-gradient(145deg, #1d2530, #101114); }
-.ask-feature-visual-community { background: radial-gradient(circle at 75% 25%, rgba(126,207,166,.18), transparent 55%), linear-gradient(145deg, #1b2a25, #101411); }
-.ask-feature-copy { display: flex; flex: 1 1 auto; min-width: 0; flex-direction: column; align-items: flex-start; gap: 5px; }
-.ask-feature-copy strong { color: #f4f4f4; font: 600 12px/1.25 var(--font-conversational); }
-.ask-feature-copy span { color: #929292; font: 400 10px/1.45 var(--font-conversational); white-space: normal; }
-.ask-feature-arrow { position: absolute; right: 12px; top: 12px; color: #777; font: 400 13px/1 var(--font-conversational); }
-body.chat-active #ask-feature-carousel { display: none !important; }
-
-/* My Space notes modal */
-#my-space-modal.my-space-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 130000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-    background: rgba(0,0,0,.70);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity .22s ease, visibility .22s ease;
-}
-#my-space-modal.my-space-modal.open {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-.my-space-dialog {
-    width: min(620px, calc(100vw - 28px));
-    max-height: min(84vh, 760px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 20px;
-    background: linear-gradient(180deg, #121212, #080808);
-    box-shadow: 0 28px 85px rgba(0,0,0,.58);
-    transform: translateY(8px) scale(.99);
-    transition: transform .22s ease;
-}
-#my-space-modal.open .my-space-dialog { transform: translateY(0) scale(1); }
-.my-space-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 22px 22px 17px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-}
-.my-space-header h2 { color: #f5f5f5; font: 500 21px/1.25 var(--font-ui); }
-.my-space-header p { margin-top: 5px; color: #858585; font: 400 11px/1.5 var(--font-conversational); }
-.my-space-close {
-    width: 32px; height: 32px; flex: 0 0 32px;
-    border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
-    background: rgba(255,255,255,.035); color: #aaa; font-size: 20px; cursor: pointer;
-}
-.my-space-close:hover { background: rgba(255,255,255,.08); color: #fff; }
-.my-space-list-meta { padding: 15px 22px 9px; color: #777; font: 500 10px var(--font-conversational); }
-.my-space-notes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    min-height: 100px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 0 16px 18px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,.18) transparent;
-}
-.my-space-note-card {
-    padding: 13px 14px;
-    border: 1px solid rgba(255,255,255,.075);
-    border-radius: 13px;
-    background: rgba(255,255,255,.025);
-}
-.my-space-note-title { color: #ededed; font: 600 11px/1.45 var(--font-conversational); }
-.my-space-note-preview {
-    margin-top: 7px;
-    color: #959595;
-    font: 400 11px/1.65 var(--font-conversational);
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    line-clamp: 4;
-    overflow: hidden;
-}
-.my-space-empty {
-    margin: 0 6px 6px;
-    padding: 28px 20px;
-    border: 1px dashed rgba(255,255,255,.12);
-    border-radius: 14px;
-    text-align: center;
-    color: #999;
-    font: 400 12px/1.7 var(--font-conversational);
-}
-@media (max-width: 600px) {
-    #ask-feature-carousel.ask-feature-carousel { gap: 9px; margin-bottom: 10px; }
-    .ask-feature-card { flex: 0 0 min(82vw, 300px); min-width: min(82vw, 300px); min-height: 82px; padding: 9px 28px 9px 9px; gap: 10px; border-radius: 15px; }
-    .ask-feature-visual { width: 58px; height: 60px; flex-basis: 58px; border-radius: 11px; }
-    .ask-feature-visual svg { width: 40px; height: 40px; }
-    .ask-feature-copy strong { font-size: 12px; }
-    .ask-feature-copy span { font-size: 9.5px; }
-    #my-space-modal.my-space-modal { padding: 12px; }
-    .my-space-dialog { width: 100%; max-height: 86vh; border-radius: 17px; }
-    .my-space-header { padding: 18px 17px 14px; }
-    .my-space-header h2 { font-size: 19px; }
-    .my-space-list-meta { padding: 13px 17px 8px; }
-    .my-space-notes-list { padding: 0 12px 14px; }
-    .my-space-note-card { padding: 12px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .learn-video-skeleton::after, .learn-thumb-skeleton { animation: none !important; }
-}
+    #circle-library-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 200000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(0,0,0,.76);
+        backdrop-filter: blur(9px);
+        -webkit-backdrop-filter: blur(9px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .22s ease, visibility .22s ease;
+    }
+    #circle-library-modal.show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+    .circle-library-dialog {
+        display: flex;
+        flex-direction: column;
+        width: min(520px, 100%);
+        height: min(660px, calc(100dvh - 32px));
+        max-height: calc(100dvh - 32px);
+        min-height: min(340px, calc(100dvh - 32px));
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 18px;
+        background: #090909;
+        color: #fff;
+        box-shadow: 0 22px 70px rgba(0,0,0,.65);
+        font-family: var(--font-conversational);
+    }
+    .circle-library-header {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 19px 20px 16px;
+        border-bottom: 1px solid rgba(255,255,255,.09);
+    }
+    .circle-library-heading { min-width: 0; }
+    #circle-library-modal-title {
+        color: #fff;
+        font: 500 20px var(--font-ui);
+        line-height: 1.25;
+    }
+    .circle-library-subtitle {
+        margin-top: 5px;
+        color: #888;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+    #circle-library-close {
+        display: inline-flex;
+        flex: 0 0 32px;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid rgba(255,255,255,.13);
+        border-radius: 50%;
+        background: rgba(255,255,255,.045);
+        color: #ddd;
+        font-size: 21px;
+        line-height: 1;
+        cursor: pointer;
+    }
+    #circle-library-close:hover { background: rgba(255,255,255,.1); color: #fff; }
+    #circle-library-scroll-area {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 14px 16px 20px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    #circle-library-scroll-area::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    .circle-library-view[hidden] { display: none !important; }
+    .circle-library-course-group + .circle-library-course-group { margin-top: 20px; }
+    .circle-library-course-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 2px 2px 9px;
+        color: #aaa;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+    }
+    .circle-library-course-count {
+        flex: 0 0 auto;
+        padding: 3px 7px;
+        border: 1px solid rgba(255,255,255,.09);
+        border-radius: 99px;
+        color: #888;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+    }
+    .circle-library-note-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        min-width: 0;
+        margin: 0 0 8px;
+        padding: 13px 14px;
+        border: 1px solid rgba(255,255,255,.09);
+        border-radius: 12px;
+        background: rgba(255,255,255,.025);
+        color: #fff;
+        text-align: left;
+        cursor: pointer;
+        transition: background .18s ease, border-color .18s ease;
+    }
+    .circle-library-note-card:hover {
+        background: rgba(255,255,255,.055);
+        border-color: rgba(255,255,255,.2);
+    }
+    .circle-library-note-copy { flex: 1 1 auto; min-width: 0; }
+    .circle-library-note-title {
+        display: block;
+        overflow: hidden;
+        color: #e9e9e9;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .circle-library-note-preview {
+        display: -webkit-box;
+        overflow: hidden;
+        margin-top: 5px;
+        color: #858585;
+        font-size: 11px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+    .circle-library-note-arrow {
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+        color: #8c8c8c;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .circle-library-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        padding: 28px 24px;
+        color: #888;
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+    .circle-library-empty strong {
+        margin-bottom: 8px;
+        color: #e0e0e0;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    #circle-library-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin: 2px 0 19px;
+        padding: 5px 0;
+        border: 0;
+        background: transparent;
+        color: #999;
+        font: 500 12px var(--font-conversational);
+        cursor: pointer;
+    }
+    #circle-library-back:hover { color: #fff; }
+    #circle-library-detail-title {
+        margin: 0 0 14px;
+        color: #fff;
+        font: 500 18px/1.4 var(--font-ui);
+        overflow-wrap: anywhere;
+    }
+    #circle-library-detail-note {
+        color: #d0d0d0;
+        font-size: 13px;
+        line-height: 1.75;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        user-select: text;
+        -webkit-user-select: text;
+    }
+    @media (max-width: 480px) {
+        #ask-utility-buttons { gap: 8px; margin-bottom: 10px; }
+        .ask-utility-button { gap: 6px; padding: 10px 7px; font-size: 11px; }
+        .ask-utility-button svg { width: 15px; height: 15px; flex-basis: 15px; }
+        #circle-library-modal { padding: 12px; }
+        .circle-library-dialog {
+            width: 100%;
+            height: min(620px, calc(100dvh - 24px));
+            max-height: calc(100dvh - 24px);
+            min-height: min(320px, calc(100dvh - 24px));
+            border-radius: 16px;
+        }
+        .circle-library-header { padding: 16px 16px 14px; }
+        #circle-library-scroll-area { padding: 12px 12px 16px; }
+        .circle-library-note-card { padding: 12px; gap: 10px; }
+    }
 </style>
 
 </head>
@@ -6348,20 +6357,6 @@ body.chat-active #ask-feature-carousel { display: none !important; }
             </div>
         </div>
 
-        <div id="my-space-modal" class="my-space-modal" aria-hidden="true">
-            <section class="my-space-dialog" role="dialog" aria-modal="true" aria-labelledby="my-space-title">
-                <header class="my-space-header">
-                    <div>
-                        <h2 id="my-space-title">My Space</h2>
-                        <p>Your saved lecture notes, all in one place.</p>
-                    </div>
-                    <button id="my-space-close" class="my-space-close" type="button" aria-label="Close My Space">×</button>
-                </header>
-                <div class="my-space-list-meta" id="my-space-note-count">Your notes</div>
-                <div id="my-space-notes-list" class="my-space-notes-list" aria-live="polite"></div>
-            </section>
-        </div>
-
         <!-- =====================================================
              LEARN MODE
              Desktop: My Learnings | Video | Playlist / To-do / Notes
@@ -6423,14 +6418,7 @@ body.chat-active #ask-feature-carousel { display: none !important; }
                     <div class="learn-workspace">
                         <div class="learn-video-stage">
                             <div id="learn-player"></div>
-                            <div id="learn-loading" class="learn-loading" aria-label="Loading lesson" role="status">
-                                <div class="learn-video-skeleton" aria-hidden="true">
-                                    <span class="learn-video-skeleton-header"></span>
-                                    <span class="learn-video-skeleton-main"></span>
-                                    <span class="learn-video-skeleton-meta"></span>
-                                    <span class="learn-video-skeleton-progress"></span>
-                                </div>
-                            </div>
+                            <div id="learn-loading" class="learn-loading" aria-label="Loading Learn"><span class="learn-loading-circle" aria-hidden="true"></span></div>
                         </div>
 
                         <aside class="learn-playlist" id="learn-right-panel" aria-label="Learn tools">
@@ -6555,37 +6543,15 @@ body.chat-active #ask-feature-carousel { display: none !important; }
             </div>
 
             <div id="input-container">
-                <div id="ask-feature-carousel" class="ask-feature-carousel" aria-label="Explore Circle">
-                    <button id="ask-feature-my-space" class="ask-feature-card" type="button" aria-haspopup="dialog" aria-controls="my-space-modal">
-                        <span class="ask-feature-visual ask-feature-visual-space" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none">
-                                <path d="M12 9.5A4.5 4.5 0 0 1 16.5 5H37v29.5a4.5 4.5 0 0 0-4.5-4.5H12V9.5Z" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.72)" stroke-width="1.4"/>
-                                <path d="M12 9.5V37a4 4 0 0 0 4 4h16.5A4.5 4.5 0 0 0 37 36.5V34H16.5A4.5 4.5 0 0 1 12 29.5" stroke="rgba(255,255,255,.72)" stroke-width="1.4"/>
-                                <path d="M19 13h12M19 18h12M19 23h8" stroke="#fff" stroke-linecap="round" stroke-width="1.6"/>
-                            </svg>
-                        </span>
-                        <span class="ask-feature-copy">
-                            <strong>My Space</strong>
-                            <span>All your lecture notes, in one place.</span>
-                        </span>
-                        <span class="ask-feature-arrow" aria-hidden="true">↗</span>
+                <div id="ask-utility-buttons" aria-label="Ask tools">
+                    <button type="button" id="my-library-btn" class="ask-utility-button" aria-haspopup="dialog" aria-controls="circle-library-modal">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7A2 2 0 0 1 5 17.5z"/><path d="M5 7h10.5A2.5 2.5 0 0 1 18 9.5M8 11h6M8 14h6"/><path d="M18 7h1a2 2 0 0 1 2 2v10.5H9"/></svg>
+                        <span>My Library</span>
                     </button>
-                    <a id="ask-feature-bba-circle" class="ask-feature-card" href="https://chat.whatsapp.com/HPvD613vpgkF9ABUZXS3My" target="_blank" rel="noopener noreferrer" aria-label="Join BBA Circle on WhatsApp">
-                        <span class="ask-feature-visual ask-feature-visual-community" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none">
-                                <circle cx="24" cy="16" r="6" fill="rgba(255,255,255,.20)" stroke="rgba(255,255,255,.8)" stroke-width="1.5"/>
-                                <path d="M13 36c.8-6.2 4.7-9.5 11-9.5S34.2 29.8 35 36" stroke="rgba(255,255,255,.8)" stroke-width="1.6" stroke-linecap="round"/>
-                                <circle cx="11.5" cy="19" r="4" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.55)" stroke-width="1.3"/>
-                                <path d="M4.5 34c.5-4.4 2.9-6.7 6.9-6.7 1.5 0 2.7.3 3.7.9" stroke="rgba(255,255,255,.55)" stroke-width="1.4" stroke-linecap="round"/>
-                                <circle cx="36.5" cy="19" r="4" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.55)" stroke-width="1.3"/>
-                                <path d="M33 28.2c1-.6 2.2-.9 3.7-.9 4 0 6.4 2.3 6.9 6.7" stroke="rgba(255,255,255,.55)" stroke-width="1.4" stroke-linecap="round"/>
-                            </svg>
-                        </span>
-                        <span class="ask-feature-copy">
-                            <strong>BBA Circle</strong>
-                            <span>Meet fellow BBA students and study together.</span>
-                        </span>
-                        <span class="ask-feature-arrow" aria-hidden="true">↗</span>
+                    <a id="bba-circle-btn" class="ask-utility-button" href="https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My" target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.5A8.5 8.5 0 1 1 20.5 11.5Z"/><path d="M8.2 8.2c.3-.5.6-.5.9-.5h.4c.2 0 .4.1.5.4l.7 1.6c.1.2.1.4-.1.6l-.5.6c-.2.2-.1.4 0 .6.5.8 1.2 1.5 2 1.9.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.2.1.3.3.3.5 0 .4-.2 1.1-.7 1.5-.5.4-1.2.6-2 .4-1.1-.3-2.4-.9-3.6-2.1-1.3-1.2-2-2.8-2.1-3.6-.1-.7.3-1.3.7-1.7Z"/></svg>
+                        <span>BBA Circle</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
                     </a>
                 </div>
                 <div id="suggestion-pills">
@@ -6607,6 +6573,29 @@ body.chat-active #ask-feature-carousel { display: none !important; }
             </div>
 
         </div>
+    </div>
+
+
+    <div id="circle-library-modal" aria-hidden="true">
+        <section class="circle-library-dialog" role="dialog" aria-modal="true" aria-labelledby="circle-library-modal-title" tabindex="-1">
+            <header class="circle-library-header">
+                <div class="circle-library-heading">
+                    <h2 id="circle-library-modal-title">My Library</h2>
+                    <p class="circle-library-subtitle">Your saved notes, organised by course and lecture.</p>
+                </div>
+                <button type="button" id="circle-library-close" aria-label="Close My Library">×</button>
+            </header>
+            <div id="circle-library-scroll-area">
+                <div id="circle-library-list-view" class="circle-library-view">
+                    <div id="circle-library-note-list"></div>
+                </div>
+                <div id="circle-library-detail-view" class="circle-library-view" hidden>
+                    <button type="button" id="circle-library-back"><span aria-hidden="true">←</span><span>All notes</span></button>
+                    <h3 id="circle-library-detail-title"></h3>
+                    <div id="circle-library-detail-note"></div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
@@ -7509,14 +7498,22 @@ body.chat-active #ask-feature-carousel { display: none !important; }
             { text: 'Want to join BBA Circle?', url: 'https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My' }
         ];
 
-        // Gather all suggestions grouped by category
+        // Only use prompts that the live intent matcher resolves to their own answer.
+        // This prevents carousel prompts from pointing to the fallback or a different intent.
         const categorizedSuggestions = {};
         knowledgeBase.forEach(intent => {
-            if (intent.suggestionPool && intent.suggestionPool.length > 0) {
+            const eligiblePrompts = (intent.suggestionPool || []).filter(prompt => {
+                try {
+                    return matchIntent(prompt).intentId === intent.id;
+                } catch (_) {
+                    return false;
+                }
+            });
+            if (eligiblePrompts.length > 0) {
                 if (!categorizedSuggestions[intent.category]) {
                     categorizedSuggestions[intent.category] = [];
                 }
-                categorizedSuggestions[intent.category].push(...intent.suggestionPool);
+                categorizedSuggestions[intent.category].push(...eligiblePrompts);
             }
         });
 
@@ -7612,6 +7609,169 @@ body.chat-active #ask-feature-carousel { display: none !important; }
             container.style.transform = 'translateY(0)';
             
             container.scrollLeft = 0;
+        }
+
+        /*******************************************************
+         * ASK: MY LIBRARY (reads existing per-lecture local notes)
+         *******************************************************/
+        function getCircleLibraryEntries() {
+            const sourceNotes = learnNotes && typeof learnNotes === 'object' ? learnNotes : {};
+            const courseOrder = Object.keys(LEARN_COURSES);
+            return Object.entries(sourceNotes).map(([key, rawNote]) => {
+                const note = String(rawNote == null ? '' : rawNote).trim();
+                const separator = key.lastIndexOf('::');
+                if (!note || separator < 1) return null;
+                const courseId = key.slice(0, separator);
+                const index = Number.parseInt(key.slice(separator + 2), 10);
+                if (!Number.isInteger(index) || index < 0) return null;
+                const course = LEARN_COURSES[courseId];
+                return {
+                    key,
+                    note,
+                    courseId,
+                    courseName: course ? course.name : courseId,
+                    courseOrder: courseOrder.indexOf(courseId) < 0 ? courseOrder.length : courseOrder.indexOf(courseId),
+                    index
+                };
+            }).filter(Boolean).sort((a, b) => {
+                if (a.courseOrder !== b.courseOrder) return a.courseOrder - b.courseOrder;
+                if (a.courseId !== b.courseId) return a.courseName.localeCompare(b.courseName);
+                return a.index - b.index;
+            });
+        }
+
+        function renderCircleLibraryNotes() {
+            const list = document.getElementById('circle-library-note-list');
+            if (!list) return;
+            list.replaceChildren();
+            const entries = getCircleLibraryEntries();
+
+            if (!entries.length) {
+                const empty = document.createElement('div');
+                empty.className = 'circle-library-empty';
+                const title = document.createElement('strong');
+                title.textContent = 'No saved notes yet';
+                const copy = document.createElement('p');
+                copy.textContent = 'Open Learn, choose a video, and write a note in My Notes. Your saved notes will appear here.';
+                empty.append(title, copy);
+                list.appendChild(empty);
+                return;
+            }
+
+            const courseIds = [...new Set(entries.map(entry => entry.courseId))];
+            courseIds.forEach(courseId => {
+                const groupEntries = entries.filter(entry => entry.courseId === courseId);
+                const section = document.createElement('section');
+                section.className = 'circle-library-course-group';
+                const heading = document.createElement('div');
+                heading.className = 'circle-library-course-heading';
+                const courseTitle = document.createElement('span');
+                courseTitle.textContent = groupEntries[0].courseName;
+                const count = document.createElement('span');
+                count.className = 'circle-library-course-count';
+                count.textContent = `${groupEntries.length} ${groupEntries.length === 1 ? 'note' : 'notes'}`;
+                heading.append(courseTitle, count);
+                section.appendChild(heading);
+
+                groupEntries.forEach(entry => {
+                    const card = document.createElement('button');
+                    card.type = 'button';
+                    card.className = 'circle-library-note-card';
+                    card.dataset.noteKey = entry.key;
+                    card.setAttribute('aria-label', `Open notes for ${entry.courseName}, lecture ${entry.index + 1}`);
+
+                    const copy = document.createElement('span');
+                    copy.className = 'circle-library-note-copy';
+                    const title = document.createElement('span');
+                    title.className = 'circle-library-note-title';
+                    title.textContent = `Lecture ${String(entry.index + 1).padStart(2, '0')}`;
+                    const preview = document.createElement('span');
+                    preview.className = 'circle-library-note-preview';
+                    const flattened = entry.note.replace(/\s+/g, ' ').trim();
+                    preview.textContent = flattened.length > 150 ? `${flattened.slice(0, 147)}…` : flattened;
+                    copy.append(title, preview);
+
+                    const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    arrow.setAttribute('viewBox', '0 0 24 24');
+                    arrow.setAttribute('aria-hidden', 'true');
+                    arrow.classList.add('circle-library-note-arrow');
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', 'M5 12h14M13 5l7 7-7 7');
+                    arrow.appendChild(path);
+                    card.append(copy, arrow);
+                    card.addEventListener('click', () => openCircleLibraryNote(entry.key));
+                    section.appendChild(card);
+                });
+                list.appendChild(section);
+            });
+        }
+
+        function openCircleLibraryNote(noteKey) {
+            const entry = getCircleLibraryEntries().find(item => item.key === noteKey);
+            if (!entry) return;
+            const listView = document.getElementById('circle-library-list-view');
+            const detailView = document.getElementById('circle-library-detail-view');
+            const title = document.getElementById('circle-library-detail-title');
+            const body = document.getElementById('circle-library-detail-note');
+            if (!listView || !detailView || !title || !body) return;
+            title.textContent = `${entry.courseName} · Lecture ${String(entry.index + 1).padStart(2, '0')}`;
+            body.textContent = entry.note;
+            listView.hidden = true;
+            detailView.hidden = false;
+            document.getElementById('circle-library-scroll-area').scrollTop = 0;
+        }
+
+        function openCircleLibraryModal() {
+            flushLearnNotesSave();
+            renderCircleLibraryNotes();
+            const modal = document.getElementById('circle-library-modal');
+            const listView = document.getElementById('circle-library-list-view');
+            const detailView = document.getElementById('circle-library-detail-view');
+            const scrollArea = document.getElementById('circle-library-scroll-area');
+            if (!modal) return;
+            if (listView) listView.hidden = false;
+            if (detailView) detailView.hidden = true;
+            if (scrollArea) scrollArea.scrollTop = 0;
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            const closeButton = document.getElementById('circle-library-close');
+            if (closeButton) closeButton.focus({ preventScroll: true });
+        }
+
+        function closeCircleLibraryModal() {
+            const modal = document.getElementById('circle-library-modal');
+            if (!modal) return;
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            const listView = document.getElementById('circle-library-list-view');
+            const detailView = document.getElementById('circle-library-detail-view');
+            if (listView) listView.hidden = false;
+            if (detailView) detailView.hidden = true;
+        }
+
+        function setupCircleLibraryUI() {
+            const openButton = document.getElementById('my-library-btn');
+            const closeButton = document.getElementById('circle-library-close');
+            const backButton = document.getElementById('circle-library-back');
+            const modal = document.getElementById('circle-library-modal');
+            if (openButton) openButton.addEventListener('click', openCircleLibraryModal);
+            if (closeButton) closeButton.addEventListener('click', closeCircleLibraryModal);
+            if (backButton) backButton.addEventListener('click', () => {
+                const listView = document.getElementById('circle-library-list-view');
+                const detailView = document.getElementById('circle-library-detail-view');
+                if (detailView) detailView.hidden = true;
+                if (listView) listView.hidden = false;
+                const scrollArea = document.getElementById('circle-library-scroll-area');
+                if (scrollArea) scrollArea.scrollTop = 0;
+            });
+            if (modal) modal.addEventListener('click', event => {
+                if (event.target === modal) closeCircleLibraryModal();
+            });
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && modal && modal.classList.contains('show')) {
+                    closeCircleLibraryModal();
+                }
+            });
         }
 
         /*******************************************************
@@ -7858,6 +8018,7 @@ body.chat-active #ask-feature-carousel { display: none !important; }
             }
 
             setupEventListeners();
+            setupCircleLibraryUI();
 
             if (isRegistered && userName && profilePhotoDataUrl) {
                 setTimeout(showProfileReminder, 4200);
@@ -8862,20 +9023,6 @@ body.chat-active #ask-feature-carousel { display: none !important; }
 
         function setupEventListeners() {
             mountShellModelControl();
-
-            const mySpaceTrigger = document.getElementById('ask-feature-my-space');
-            const mySpaceModal = document.getElementById('my-space-modal');
-            const mySpaceClose = document.getElementById('my-space-close');
-            if (mySpaceTrigger) mySpaceTrigger.addEventListener('click', openMySpaceModal);
-            if (mySpaceClose) mySpaceClose.addEventListener('click', closeMySpaceModal);
-            if (mySpaceModal) {
-                mySpaceModal.addEventListener('click', (event) => {
-                    if (event.target === mySpaceModal) closeMySpaceModal();
-                });
-            }
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') closeMySpaceModal();
-            });
             /* Unified shell navigation */
             document.getElementById('shell-learn-btn').addEventListener('click', () => switchCircleMode('learn'));
             document.getElementById('shell-ask-btn').addEventListener('click', () => switchCircleMode('ask'));
@@ -10566,80 +10713,10 @@ setInterval(() => {
             container.scrollTop = Math.max(0, Math.min(centeredTop, maxScrollTop));
         }
 
-        function renderMySpaceNotes() {
-            const list = document.getElementById('my-space-notes-list');
-            const count = document.getElementById('my-space-note-count');
-            if (!list || !count) return;
-
-            const courseOrder = Object.keys(LEARN_COURSES);
-            const records = Object.entries(learnNotes || {}).map(([key, rawNote]) => {
-                const separator = key.lastIndexOf('::');
-                if (separator < 1) return null;
-
-                const courseId = key.slice(0, separator);
-                const lectureIndex = Number(key.slice(separator + 2));
-                const course = LEARN_COURSES[courseId];
-                const noteText = String(rawNote || '').trim();
-                if (!course || !Number.isInteger(lectureIndex) || lectureIndex < 0 || !noteText) return null;
-
-                return { courseId, lectureIndex, courseName: course.name, noteText };
-            }).filter(Boolean).sort((a, b) => {
-                const courseDifference = courseOrder.indexOf(a.courseId) - courseOrder.indexOf(b.courseId);
-                return courseDifference || a.lectureIndex - b.lectureIndex;
-            });
-
-            count.textContent = `${records.length} saved ${records.length === 1 ? 'note' : 'notes'}`;
-
-            if (!records.length) {
-                list.innerHTML = '<div class="my-space-empty">Your lecture notes will appear here.<br>Open Learn, choose a lecture, and save a note to build your space.</div>';
-                return;
-            }
-
-            list.innerHTML = records.map(record => {
-                const title = `Lecture ${String(record.lectureIndex + 1).padStart(2, '0')} · ${record.courseName}`;
-                const preview = record.noteText.length > 260
-                    ? `${record.noteText.slice(0, 260).trimEnd()}…`
-                    : record.noteText;
-
-                return `<article class="my-space-note-card">
-                    <div class="my-space-note-title">${escapeHtml(title)}</div>
-                    <div class="my-space-note-preview">${escapeHtml(preview)}</div>
-                </article>`;
-            }).join('');
-        }
-
-        function openMySpaceModal() {
-            const modal = document.getElementById('my-space-modal');
-            if (!modal) return;
-
-            /* Read the existing local notes store. Google Sheets logging remains
-               untouched; this UI deliberately labels entries by course/lecture,
-               not by the YouTube title. */
-            try {
-                const storedNotes = JSON.parse(localStorage.getItem('circle_v2_learn_notes_v1') || '{}');
-                if (storedNotes && typeof storedNotes === 'object') {
-                    learnNotes = Object.assign({}, storedNotes, learnNotes);
-                }
-            } catch (_) {}
-
-            renderMySpaceNotes();
-            modal.classList.add('open');
-            modal.setAttribute('aria-hidden', 'false');
-        }
-
-        function closeMySpaceModal() {
-            const modal = document.getElementById('my-space-modal');
-            if (!modal) return;
-            modal.classList.remove('open');
-            modal.setAttribute('aria-hidden', 'true');
-        }
-
         function renderLearnThumbnails() {
             const container = document.getElementById('learn-thumbnails');
             if (!learnPlaylistIds.length) {
-                container.innerHTML = Array.from({ length: 5 }, () =>
-                    '<div class="learn-thumb-skeleton" aria-hidden="true"></div>'
-                ).join('');
+                container.innerHTML = '';
                 return;
             }
 
@@ -10648,38 +10725,17 @@ setInterval(() => {
                 const active = index === learnActiveIndex;
                 const completed = index < savedIndex;
                 return `
-                    <button class="learn-thumb is-loading ${active ? 'active' : ''} ${completed ? 'completed' : ''}"
+                    <button class="learn-thumb ${active ? 'active' : ''} ${completed ? 'completed' : ''}"
                             type="button"
                             data-learn-index="${index}"
                             aria-label="Lecture ${String(index + 1).padStart(2, '0')}">
-                        <img loading="lazy" decoding="async" src="https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg" alt="">
+                        <img loading="lazy" src="https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg" alt="">
                     </button>
                 `;
             }).join('');
 
             container.querySelectorAll('.learn-thumb').forEach(button => {
                 button.addEventListener('click', () => openLearnLesson(Number(button.dataset.learnIndex)));
-            });
-
-            /* Keep the skeleton visible for each individual thumbnail until its
-             * YouTube image has actually loaded (or failed), not merely until the
-             * playlist ID list becomes available. */
-            container.querySelectorAll('.learn-thumb img').forEach(image => {
-                const thumbnail = image.closest('.learn-thumb');
-                if (!thumbnail) return;
-
-                const finishThumbnailLoad = () => {
-                    if (image.naturalWidth > 0) {
-                        thumbnail.classList.remove('is-loading', 'image-unavailable');
-                    } else {
-                        thumbnail.classList.remove('is-loading');
-                        thumbnail.classList.add('image-unavailable');
-                    }
-                };
-
-                image.addEventListener('load', finishThumbnailLoad, { once: true });
-                image.addEventListener('error', finishThumbnailLoad, { once: true });
-                if (image.complete) finishThumbnailLoad();
             });
 
             if (learnFocusSavedThumbnailPending) {
