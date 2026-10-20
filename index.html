@@ -5608,9 +5608,9 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px;
 }
 .donation-amount-btn {
-    min-height: 40px; padding: 0 8px; border: 1px solid rgba(255,255,255,.1);
+    min-height: 46px; padding: 0 8px; border: 1px solid rgba(255,255,255,.1);
     border-radius: 10px; background: rgba(255,255,255,.035); color: #bbb; cursor: pointer;
-    font: 600 11px var(--font-conversational); transition: background .18s ease, color .18s ease, border-color .18s ease;
+    font: 600 15px var(--font-conversational); transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
 .donation-amount-btn:hover, .donation-amount-btn.active {
     background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.23); color: #fff;
@@ -5638,7 +5638,11 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     font: 600 12px var(--font-conversational); transition: background .18s ease;
 }
 .donation-pay-btn:hover { background: #e8e8e8; }
-.donation-note { margin: 11px 0 0; text-align: center; color: #666; font: 400 9px/1.45 var(--font-conversational); }
+.donation-runway-warning { color: #ff4d5a; font-weight: 700; }
+.donation-note { margin: 11px 0 0; display: flex; align-items: flex-start; justify-content: center; gap: 6px; text-align: left; color: #777; font: 400 9px/1.5 var(--font-conversational); }
+.donation-note-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 12px; width: 12px; height: 12px; margin-top: 1px; color: #888; }
+.donation-note-icon svg { display: block; width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.donation-note-copy { min-width: 0; flex: 1 1 auto; }
 .donation-upi-id { margin-top: 10px; text-align: center; color: #8a8a8a; font: 500 10px var(--font-conversational); user-select: text; }
 
 /* Donation-only hover and amount-tier feedback. Other menu items remain unchanged. */
@@ -6615,7 +6619,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             </div>
             <div class="donation-reminder-copy">
                 <span class="donation-reminder-title">Support Circle AI</span>
-                <span class="donation-reminder-subtitle">If Circle AI has been useful to you, you can support its continued development.</span>
+                <span class="donation-reminder-subtitle"><strong class="donation-runway-warning">Circle AI currently has funding for fewer than 30 days of operations.</strong> If it has been useful to you, a voluntary contribution can help extend its runway.</span>
             </div>
             <button id="donation-reminder-action" class="donation-reminder-action" type="button">Support</button>
             <button id="donation-reminder-close" class="donation-reminder-close" type="button" aria-label="Close donation reminder">×</button>
@@ -6626,7 +6630,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 <div class="donation-modal-head">
                     <div>
                         <h2 id="donation-modal-title" class="donation-modal-title">Support Circle AI</h2>
-                        <p class="donation-modal-subtitle">Circle AI is a student-led, non-monetary initiative. If it has been useful to you, you can contribute to its continued development.</p>
+                        <p class="donation-modal-subtitle">Circle AI is a student-led initiative, and <strong class="donation-runway-warning">current funding covers fewer than 30 days of operations.</strong> If it has been useful to you, a voluntary contribution can help extend its runway.</p>
                     </div>
                     <button id="donation-modal-close" class="donation-modal-close" type="button" aria-label="Close donation window">×</button>
                 </div>
@@ -6647,7 +6651,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 <div class="donation-upi-label">Scan with any UPI app</div>
                 <div class="donation-upi-id">UPI: satyapsamal@iob</div>
                 <button id="donation-pay-btn" class="donation-pay-btn" type="button">Open UPI app to pay ₹50</button>
-                <p class="donation-note">Payment is completely optional. Circle AI does not verify or record whether a donation was completed.</p>
+                <p class="donation-note"><span class="donation-note-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.75a4 4 0 0 1 8 0V10"/></svg></span><span class="donation-note-copy">Your payment is processed securely through UPI. Circle AI does not store or access your payment details.</span></p>
             </div>
         </div>
 
@@ -8451,6 +8455,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
                         setTimeout(showProfileReminder, 4200);
                         startMainInterface().then(() => {
                             switchCircleMode('learn');
+                            startCircleDonationUsageTracker();
                             setTimeout(showReturningMotivationToast, 750);
                             scheduleDonationNudge();
                         });
@@ -8727,6 +8732,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             document.getElementById('onboarding-layer').classList.add('hidden');
             await startMainInterface();
             switchCircleMode('learn');
+            startCircleDonationUsageTracker();
         }
 
         async function handleOnboardingPhotoUpload(event) {
@@ -11858,12 +11864,33 @@ setInterval(() => {
         const CIRCLE_DONATION_PAYEE = 'Satya Prakash Samal';
         const CIRCLE_DONATION_DEFAULT_AMOUNT = 50;
         const CIRCLE_DONATION_ESTABLISHED_AMOUNT = 100;
+        const CIRCLE_DONATION_MIN_AMOUNT = 10;
         const CIRCLE_DONATION_MAX_AMOUNT = 100000;
         const CIRCLE_DONATION_ESTABLISHED_DAYS = 14;
         const CIRCLE_DONATION_ACTIVE_DAYS_KEY = 'circle_v2_donation_active_days_v1';
-        const CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY = 'circle_v2_donation_nudge_cooldown_until';
+        const CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY = 'circle_v2_donation_nudge_cooldown_until_v2';
+        const CIRCLE_DONATION_LEGACY_SUPPORT_COOLDOWN_KEY = 'circle_v2_donation_nudge_cooldown_until';
+        const CIRCLE_DONATION_COOLDOWN_MIGRATION_KEY = 'circle_v2_donation_support_cooldown_migration_v1';
+        const CIRCLE_DONATION_NUDGE_SESSION_KEY = 'circle_v2_donation_nudge_shown_session_v1';
+        const CIRCLE_DONATION_PERSONALIZED_SHOWN_DAY_KEY = 'circle_v2_donation_personalized_shown_day_v1';
+        const CIRCLE_DONATION_USAGE_KEY = 'circle_v2_donation_usage_seconds_v1';
+        const CIRCLE_DONATION_USAGE_TRACKING_STARTED_KEY = 'circle_v2_donation_usage_tracking_started_at_v1';
+        const CIRCLE_DONATION_USAGE_IDLE_MS = 60000;
+        const CIRCLE_DONATION_USAGE_PERSIST_MS = 15000;
+        const CIRCLE_DONATION_PERSONALIZED_MIN_SECONDS = 10 * 60;
+        const CIRCLE_DONATION_PERSONALIZED_BASELINE_MS = 14 * 24 * 60 * 60 * 1000;
+        const CIRCLE_DONATION_SUPPORT_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+        const CIRCLE_DONATION_SUPPORT_ENGAGEMENT_MS = 5000;
         let circleDonationAmount = CIRCLE_DONATION_DEFAULT_AMOUNT;
         let circleDonationNudgeTimer = null;
+        let circleDonationSupportEngagementTimer = null;
+        let circleDonationSupportEngagementPending = false;
+        let circleDonationUsageTrackerStarted = false;
+        let circleDonationUsageTrackerTimer = null;
+        let circleDonationUsageLastTick = 0;
+        let circleDonationUsageLastActivity = 0;
+        let circleDonationUsageLastPersistAt = 0;
+        let circleDonationUsageData = {};
 
         function getCircleLocalDateKey() {
             const now = new Date();
@@ -11920,7 +11947,7 @@ setInterval(() => {
             const raw = getPreference('circleDonationAmount', '');
             if (raw === '' || raw === null || raw === undefined) return null;
             const amount = Number(raw);
-            return Number.isInteger(amount) && amount >= 1 && amount <= CIRCLE_DONATION_MAX_AMOUNT ? amount : null;
+            return Number.isInteger(amount) && amount >= CIRCLE_DONATION_MIN_AMOUNT && amount <= CIRCLE_DONATION_MAX_AMOUNT ? amount : null;
         }
 
         function getCircleDonationInitialAmount() {
@@ -11935,7 +11962,7 @@ setInterval(() => {
 
         function buildCircleUpiUri(amount) {
             const numeric = Number(amount);
-            const safeAmount = Math.max(1, Math.min(CIRCLE_DONATION_MAX_AMOUNT, Math.round(Number.isFinite(numeric) ? numeric : CIRCLE_DONATION_DEFAULT_AMOUNT)));
+            const safeAmount = Math.max(CIRCLE_DONATION_MIN_AMOUNT, Math.min(CIRCLE_DONATION_MAX_AMOUNT, Math.round(Number.isFinite(numeric) ? numeric : CIRCLE_DONATION_DEFAULT_AMOUNT)));
             const params = new URLSearchParams({
                 pa: CIRCLE_DONATION_UPI_ID,
                 pn: CIRCLE_DONATION_PAYEE,
@@ -11971,7 +11998,7 @@ setInterval(() => {
 
         function updateDonationAmount(amount, options = {}) {
             const value = Math.round(Number(amount));
-            if (!Number.isFinite(value) || value < 1 || value > CIRCLE_DONATION_MAX_AMOUNT) return;
+            if (!Number.isFinite(value) || value < CIRCLE_DONATION_MIN_AMOUNT || value > CIRCLE_DONATION_MAX_AMOUNT) return;
             circleDonationAmount = value;
 
             const presetButton = Array.from(document.querySelectorAll('.donation-amount-btn'))
@@ -12000,24 +12027,42 @@ setInterval(() => {
 
         function showDonationMinimumToast() {
             const name = String(userName || '').trim();
-            showToast(`${name ? `${name}, ` : ''}the minimum donation is ₹1.`, 3500);
+            showToast(`${name ? `${name}, ` : ''}thank you for your kindness 🫶 The minimum donation amount is ₹10.`, 5000);
         }
 
         function openDonationModal(fromNudge = false) {
             const modal = document.getElementById('donation-modal');
             if (!modal) return;
             closeMoreMenu();
-            if (fromNudge) {
-                try {
-                    localStorage.setItem(CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY, String(Date.now() + 30 * 86400000));
-                } catch (_) {}
+
+            if (circleDonationSupportEngagementTimer) {
+                clearTimeout(circleDonationSupportEngagementTimer);
+                circleDonationSupportEngagementTimer = null;
             }
+            circleDonationSupportEngagementPending = Boolean(fromNudge);
+
             dismissDonationNudge();
             updateDonationAmount(getCircleDonationInitialAmount(), { persist: false });
             modal.classList.remove('hidden');
             void modal.offsetWidth;
             modal.classList.add('show');
             modal.setAttribute('aria-hidden', 'false');
+
+            /* Count nudge-origin support interest only if the donation window remains open
+               for five seconds. This is not payment verification. */
+            if (fromNudge) {
+                circleDonationSupportEngagementTimer = setTimeout(() => {
+                    circleDonationSupportEngagementTimer = null;
+                    if (!circleDonationSupportEngagementPending || !modal.classList.contains('show')) return;
+                    try {
+                        localStorage.setItem(
+                            CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY,
+                            String(Date.now() + CIRCLE_DONATION_SUPPORT_COOLDOWN_MS)
+                        );
+                    } catch (_) {}
+                    circleDonationSupportEngagementPending = false;
+                }, CIRCLE_DONATION_SUPPORT_ENGAGEMENT_MS);
+            }
         }
 
         function closeDonationModal() {
@@ -12025,6 +12070,14 @@ setInterval(() => {
             if (!modal) return;
             modal.classList.remove('show');
             modal.setAttribute('aria-hidden', 'true');
+
+            /* Closing before the five-second threshold cancels engagement registration. */
+            if (circleDonationSupportEngagementTimer) {
+                clearTimeout(circleDonationSupportEngagementTimer);
+                circleDonationSupportEngagementTimer = null;
+            }
+            circleDonationSupportEngagementPending = false;
+
             setTimeout(() => {
                 if (!modal.classList.contains('show')) modal.classList.add('hidden');
             }, 250);
@@ -12041,23 +12094,222 @@ setInterval(() => {
             nudge.setAttribute('aria-hidden', 'true');
         }
 
-        function markDonationNudgeShownToday() {
+        function markDonationNudgeShownThisSession() {
             try {
-                localStorage.setItem('circle_v2_donation_nudge_date', getCircleLocalDateKey());
+                sessionStorage.setItem(CIRCLE_DONATION_NUDGE_SESSION_KEY, 'true');
             } catch (_) {}
         }
 
-        function shouldShowDonationNudgeToday() {
+        function migrateLegacyCircleDonationCooldown() {
             try {
-                if (localStorage.getItem('circle_v2_donation_nudge_date') === getCircleLocalDateKey()) return false;
+                if (localStorage.getItem(CIRCLE_DONATION_COOLDOWN_MIGRATION_KEY) === 'true') return;
+                const legacyUntil = Number(localStorage.getItem(CIRCLE_DONATION_LEGACY_SUPPORT_COOLDOWN_KEY) || 0);
+                if (Number.isFinite(legacyUntil) && legacyUntil > 0) {
+                    /* Older builds wrote 30 days immediately on click. Infer that click
+                       timestamp and convert only the remaining portion of a 7-day cooldown. */
+                    const legacySupportAt = legacyUntil - (30 * 24 * 60 * 60 * 1000);
+                    const newUntil = legacySupportAt + CIRCLE_DONATION_SUPPORT_COOLDOWN_MS;
+                    if (newUntil > Date.now()) {
+                        localStorage.setItem(CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY, String(newUntil));
+                    }
+                    localStorage.removeItem(CIRCLE_DONATION_LEGACY_SUPPORT_COOLDOWN_KEY);
+                }
+                localStorage.setItem(CIRCLE_DONATION_COOLDOWN_MIGRATION_KEY, 'true');
+            } catch (_) {}
+        }
+
+        function shouldShowDonationNudgeForSession() {
+            try {
+                migrateLegacyCircleDonationCooldown();
+                /* Dismissals are respected for this tab session only. The next new session
+                   can show an automatic prompt unless a seven-day engagement cooldown applies. */
+                if (sessionStorage.getItem(CIRCLE_DONATION_NUDGE_SESSION_KEY) === 'true') return false;
                 const cooldownUntil = Number(localStorage.getItem(CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY) || 0);
                 if (Number.isFinite(cooldownUntil) && Date.now() < cooldownUntil) return false;
+                if (Number.isFinite(cooldownUntil) && cooldownUntil > 0 && Date.now() >= cooldownUntil) {
+                    localStorage.removeItem(CIRCLE_DONATION_SUPPORT_COOLDOWN_KEY);
+                }
             } catch (_) {}
             return true;
         }
 
+        function getCircleDonationDateKeyOffset(daysAgo) {
+            const date = new Date();
+            date.setHours(12, 0, 0, 0);
+            date.setDate(date.getDate() - daysAgo);
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function loadCircleDonationUsageData() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(CIRCLE_DONATION_USAGE_KEY) || '{}');
+                const data = {};
+                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                    Object.entries(parsed).forEach(([dateKey, seconds]) => {
+                        if (/^\d{4}-\d{2}-\d{2}$/.test(dateKey) && Number.isFinite(Number(seconds)) && Number(seconds) >= 0) {
+                            data[dateKey] = Number(seconds);
+                        }
+                    });
+                }
+                return data;
+            } catch (_) {
+                return {};
+            }
+        }
+
+        function persistCircleDonationUsageData() {
+            try {
+                const cutoff = getCircleDonationDateKeyOffset(45);
+                Object.keys(circleDonationUsageData).forEach(dateKey => {
+                    if (dateKey < cutoff) delete circleDonationUsageData[dateKey];
+                });
+                localStorage.setItem(CIRCLE_DONATION_USAGE_KEY, JSON.stringify(circleDonationUsageData));
+                circleDonationUsageLastPersistAt = Date.now();
+            } catch (_) {}
+        }
+
+        function getCircleDonationUsageForDate(dateKey) {
+            const value = Number(circleDonationUsageData[dateKey] || 0);
+            return Number.isFinite(value) && value > 0 ? value : 0;
+        }
+
+        function getCircleDonationPersonalizedBaselineSeconds() {
+            try {
+                const trackingStart = Date.parse(localStorage.getItem(CIRCLE_DONATION_USAGE_TRACKING_STARTED_KEY) || '');
+                if (!Number.isFinite(trackingStart) || Date.now() - trackingStart < CIRCLE_DONATION_PERSONALIZED_BASELINE_MS) {
+                    return null;
+                }
+
+                /* Compare today's usage with this same weekday in each of the previous two weeks. */
+                const previousWeekSeconds = getCircleDonationUsageForDate(getCircleDonationDateKeyOffset(7));
+                const twoWeeksAgoSeconds = getCircleDonationUsageForDate(getCircleDonationDateKeyOffset(14));
+                return (previousWeekSeconds + twoWeeksAgoSeconds) / 2;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function getCircleDonationPersonalizedThresholdSeconds() {
+            const baseline = getCircleDonationPersonalizedBaselineSeconds();
+            if (baseline === null) return null;
+
+            /* Choose the lower uplift (+25% or +5 minutes), with a 10-minute total-use floor. */
+            return Math.max(
+                CIRCLE_DONATION_PERSONALIZED_MIN_SECONDS,
+                baseline + Math.min(baseline * 0.25, 5 * 60)
+            );
+        }
+
+        function isCircleDonationPersonalizedModeReady() {
+            return getCircleDonationPersonalizedBaselineSeconds() !== null;
+        }
+
+        function maybeOpenPersonalizedDonationWindow() {
+            if (localStorage.getItem('circle_v2_user_registered') !== 'true' || !String(userName || '').trim() || !shouldShowDonationNudgeForSession()) return;
+
+            const today = getCircleLocalDateKey();
+            try {
+                if (localStorage.getItem(CIRCLE_DONATION_PERSONALIZED_SHOWN_DAY_KEY) === today) return;
+            } catch (_) {}
+
+            const thresholdSeconds = getCircleDonationPersonalizedThresholdSeconds();
+            if (thresholdSeconds === null || getCircleDonationUsageForDate(today) < thresholdSeconds) return;
+
+            /* Do not layer the full support window over another modal or the profile reminder. */
+            const profileReminder = document.getElementById('profile-reminder');
+            const profileVisible = profileReminder && profileReminder.classList.contains('show');
+            const otherModalOpen = document.querySelector(
+                '.modal.show, .settings-modal.show, #settings-modal.show, #install-modal.show, #profile-edit-modal.show, #profile-crop-modal.show'
+            );
+            const donationModal = document.getElementById('donation-modal');
+            if (profileVisible || (otherModalOpen && otherModalOpen !== donationModal) ||
+                (donationModal && donationModal.classList.contains('show'))) {
+                return;
+            }
+
+            /* One automatic support window per local day and no second auto prompt in this tab session. */
+            try { localStorage.setItem(CIRCLE_DONATION_PERSONALIZED_SHOWN_DAY_KEY, today); } catch (_) {}
+            markDonationNudgeShownThisSession();
+            persistCircleDonationUsageData();
+            openDonationModal(true);
+        }
+
+        function recordCircleDonationUsageTick() {
+            const now = Date.now();
+            const lastTick = circleDonationUsageLastTick || now;
+            circleDonationUsageLastTick = now;
+
+            if (document.visibilityState !== 'hidden' && document.hasFocus && document.hasFocus() &&
+                circleDonationUsageLastActivity > 0) {
+                const activeUntil = Math.min(now, circleDonationUsageLastActivity + CIRCLE_DONATION_USAGE_IDLE_MS);
+                const activeFrom = Math.max(lastTick, circleDonationUsageLastActivity);
+                const activeMs = Math.max(0, activeUntil - activeFrom);
+                if (activeMs > 0) {
+                    const today = getCircleLocalDateKey();
+                    circleDonationUsageData[today] = getCircleDonationUsageForDate(today) + activeMs / 1000;
+                }
+            }
+
+            if (!circleDonationUsageLastPersistAt || now - circleDonationUsageLastPersistAt >= CIRCLE_DONATION_USAGE_PERSIST_MS) {
+                persistCircleDonationUsageData();
+            }
+            maybeOpenPersonalizedDonationWindow();
+        }
+
+        function startCircleDonationUsageTracker() {
+            if (circleDonationUsageTrackerStarted) return;
+            if (localStorage.getItem('circle_v2_user_registered') !== 'true' || !String(userName || '').trim()) return;
+
+            try {
+                let trackingStartedAt = localStorage.getItem(CIRCLE_DONATION_USAGE_TRACKING_STARTED_KEY) || '';
+                if (!Number.isFinite(Date.parse(trackingStartedAt))) {
+                    trackingStartedAt = new Date().toISOString();
+                    localStorage.setItem(CIRCLE_DONATION_USAGE_TRACKING_STARTED_KEY, trackingStartedAt);
+                }
+                circleDonationUsageData = loadCircleDonationUsageData();
+                const today = getCircleLocalDateKey();
+                if (!Object.prototype.hasOwnProperty.call(circleDonationUsageData, today)) {
+                    circleDonationUsageData[today] = 0;
+                    persistCircleDonationUsageData();
+                }
+            } catch (_) {
+                return;
+            }
+
+            circleDonationUsageTrackerStarted = true;
+            circleDonationUsageLastTick = Date.now();
+            circleDonationUsageLastActivity = Date.now();
+
+            const markActivity = () => {
+                if (document.visibilityState !== 'hidden') circleDonationUsageLastActivity = Date.now();
+            };
+            ['pointerdown', 'pointermove', 'keydown', 'touchstart', 'wheel', 'scroll', 'input'].forEach(type => {
+                document.addEventListener(type, markActivity, { passive: true, capture: true });
+            });
+            window.addEventListener('focus', markActivity);
+            window.addEventListener('blur', () => {
+                persistCircleDonationUsageData();
+                circleDonationUsageLastTick = Date.now();
+            });
+            document.addEventListener('visibilitychange', () => {
+                circleDonationUsageLastTick = Date.now();
+                if (document.visibilityState === 'hidden') {
+                    persistCircleDonationUsageData();
+                } else {
+                    markActivity();
+                }
+            });
+            window.addEventListener('pagehide', persistCircleDonationUsageData);
+            window.addEventListener('beforeunload', persistCircleDonationUsageData);
+
+            circleDonationUsageTrackerTimer = setInterval(recordCircleDonationUsageTick, 1000);
+        }
+
         function showDonationNudge() {
-            if (!circleReturningUser || !shouldShowDonationNudgeToday()) return;
+            if (!circleReturningUser || !shouldShowDonationNudgeForSession()) return;
             const nudge = document.getElementById('donation-reminder');
             if (!nudge) return;
 
@@ -12071,13 +12323,16 @@ setInterval(() => {
                 return;
             }
 
-            markDonationNudgeShownToday();
+            markDonationNudgeShownThisSession();
             nudge.classList.add('show');
             nudge.setAttribute('aria-hidden', 'false');
         }
 
         function scheduleDonationNudge() {
-            if (!circleReturningUser || !shouldShowDonationNudgeToday()) return;
+            if (!circleReturningUser || !shouldShowDonationNudgeForSession()) return;
+            /* After the baseline is ready, let the personalised threshold choose when
+               to open the full support window instead of showing both prompts in one visit. */
+            if (isCircleDonationPersonalizedModeReady()) return;
             if (circleDonationNudgeTimer) clearTimeout(circleDonationNudgeTimer);
             circleDonationNudgeTimer = setTimeout(showDonationNudge, 7000);
         }
@@ -12122,16 +12377,16 @@ setInterval(() => {
                         showDonationMaxLimitToast();
                         return;
                     }
-                    if (value >= 1) updateDonationAmount(value, { keepCustomValue: true });
-                    /* A zero is not accepted as a final amount; blur clamps it to ₹1. */
+                    if (value >= CIRCLE_DONATION_MIN_AMOUNT) updateDonationAmount(value, { keepCustomValue: true });
+                    /* Values below ₹10 are clamped when the field loses focus. */
                 });
 
                 custom.addEventListener('blur', () => {
                     if (custom.value.trim() === '') return;
                     const value = Number(custom.value);
-                    if (!Number.isFinite(value) || value < 1) {
-                        custom.value = '1';
-                        updateDonationAmount(1, { keepCustomValue: true });
+                    if (!Number.isFinite(value) || value < CIRCLE_DONATION_MIN_AMOUNT) {
+                        custom.value = String(CIRCLE_DONATION_MIN_AMOUNT);
+                        updateDonationAmount(CIRCLE_DONATION_MIN_AMOUNT, { keepCustomValue: true });
                         showDonationMinimumToast();
                     }
                 });
