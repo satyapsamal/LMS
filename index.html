@@ -7076,12 +7076,25 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
          *******************************************************/
         let deferredPrompt = null;
         let installGuideExpanded = false;
+        // These preferences live in this browser's storage for this site, so
+        // the next visit can restore the appropriate device/browser guidance.
+        const CIRCLE_INSTALL_ENV_KEY = 'circle_v2_install_environment_v1';
+        const CIRCLE_INSTALL_GUIDE_KEY = 'circle_v2_install_guide_expanded_v1';
+
+        function getInstallStorage(key) {
+            try { return localStorage.getItem(key); } catch (_) { return null; }
+        }
+        function setInstallStorage(key, value) {
+            try { localStorage.setItem(key, String(value)); } catch (_) { /* Storage may be disabled. */ }
+        }
 
         window.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault();
             deferredPrompt = event;
             refreshInstallControls();
-            if (document.getElementById('install-modal')?.classList.contains('show')) updateInstallModalContent();
+            if (document.getElementById('install-modal')?.classList.contains('show')) {
+                updateInstallModalContent(installGuideExpanded);
+            }
         });
 
         window.addEventListener('appinstalled', () => {
@@ -7096,48 +7109,83 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 window.navigator.standalone === true;
         }
 
-        function refreshInstallControls() {
-            const installed = isRunningAsInstalledPWA();
-            const installBtn = document.getElementById('install-btn');
-            const moreInstall = document.getElementById('more-install');
-            if (installBtn) installBtn.classList.toggle('hidden', installed || !deferredPrompt);
-            if (moreInstall) {
-                moreInstall.classList.toggle('hidden', installed);
-                const label = moreInstall.querySelector('.more-menu-label');
-                if (label && !installed) {
-                    const environment = getInstallEnvironment();
-                    const labels = {
-                        native: 'Install Circle AI',
-                        'ios-home-screen': 'Add to Home Screen',
-                        'safari-dock': 'Add Circle AI to Dock',
-                        'firefox-android': 'Add Circle AI shortcut',
-                        'firefox-desktop': 'Save Circle AI for quick access',
-                        'android-manual': 'Install / quick access',
-                        'safari-manual': 'Save Circle AI for quick access',
-                        'desktop-quick-access': 'Save Circle AI for quick access'
-                    };
-                    label.textContent = labels[environment] || 'Install Circle AI';
-                }
-            }
-        }
-
-        function getInstallEnvironment() {
+        function getInstallDeviceInfo() {
             const ua = navigator.userAgent || '';
             const isIOS = /iPad|iPhone|iPod/i.test(ua) ||
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             const isAndroid = /Android/i.test(ua);
             const isFirefox = /Firefox|FxiOS/i.test(ua);
-            const isSafari = /Safari/i.test(ua) && !/Chrome|CriOS|Edg|FxiOS|Firefox|OPR|Android/i.test(ua);
+            const isSafari = /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|Edg|FxiOS|Firefox|OPR|Opera|Android|Brave|SamsungBrowser|Vivaldi/i.test(ua);
             const isMac = /Macintosh|Mac OS X/i.test(ua) && !isIOS;
-            if (isRunningAsInstalledPWA()) return 'installed';
-            if (deferredPrompt) return 'native';
-            if (isIOS) return 'ios-home-screen';
-            if (isSafari && isMac) return 'safari-dock';
-            if (isFirefox && isAndroid) return 'firefox-android';
-            if (isFirefox) return 'firefox-desktop';
-            if (isAndroid) return 'android-manual';
-            if (isSafari) return 'safari-manual';
-            return 'desktop-quick-access';
+            const isChromium = /Chrome|Chromium|Edg|OPR|Opera|Brave|SamsungBrowser|Vivaldi/i.test(ua) && !isIOS;
+            return { isIOS, isAndroid, isFirefox, isSafari, isMac, isChromium };
+        }
+
+        function getInstallEnvironment() {
+            const { isIOS, isAndroid, isFirefox, isSafari, isMac, isChromium } = getInstallDeviceInfo();
+            let environment;
+            if (isRunningAsInstalledPWA()) environment = 'installed';
+            else if (isIOS) environment = 'ios-home-screen';
+            else if (deferredPrompt) environment = 'native';
+            else if (isFirefox && isAndroid) environment = 'firefox-android';
+            else if (isFirefox) environment = 'firefox-desktop';
+            else if (isSafari && isMac) environment = 'safari-dock';
+            else if (isSafari) environment = 'safari-manual';
+            else if (isChromium && isAndroid) environment = 'chromium-android';
+            else if (isChromium) environment = 'chromium-desktop';
+            else if (isAndroid) environment = 'android-manual';
+            else {
+                // Keep a remembered browser profile as a fallback for browsers
+                // with unusual/trimmed user-agent strings on this same origin.
+                const rememberedEnvironment = getInstallStorage(CIRCLE_INSTALL_ENV_KEY);
+                const stableProfiles = [
+                    'ios-home-screen', 'safari-dock', 'safari-manual',
+                    'firefox-android', 'firefox-desktop', 'chromium-android',
+                    'chromium-desktop', 'android-manual', 'desktop-quick-access'
+                ];
+                environment = stableProfiles.includes(rememberedEnvironment)
+                    ? rememberedEnvironment
+                    : 'desktop-quick-access';
+            }
+
+            return rememberInstallEnvironment(environment);
+        }
+
+        function rememberInstallEnvironment(environment) {
+            // Persist only the stable browser/OS profile. The native prompt can
+            // arrive later, so 'native' and 'installed' are transient states.
+            if (environment !== 'native' && environment !== 'installed') {
+                setInstallStorage(CIRCLE_INSTALL_ENV_KEY, environment);
+            }
+            return environment;
+        }
+
+        function refreshInstallControls() {
+            const environment = getInstallEnvironment();
+            const installed = environment === 'installed';
+            const installBtn = document.getElementById('install-btn');
+            const moreInstall = document.getElementById('more-install');
+            const showFloatingInstall = !installed && (environment === 'native' || environment === 'chromium-android' || environment === 'chromium-desktop');
+            if (installBtn) installBtn.classList.toggle('hidden', !showFloatingInstall);
+            if (moreInstall) {
+                moreInstall.classList.toggle('hidden', installed);
+                const label = moreInstall.querySelector('.more-menu-label');
+                if (label && !installed) {
+                    const labels = {
+                        native: 'Install Circle AI',
+                        'chromium-android': 'Install Circle AI',
+                        'chromium-desktop': 'Install Circle AI',
+                        'ios-home-screen': 'Add to Home Screen',
+                        'safari-dock': 'Add Circle AI to Dock',
+                        'firefox-android': 'Add Circle AI shortcut',
+                        'firefox-desktop': 'Save Circle AI for quick access',
+                        'android-manual': 'Install / quick access',
+                        'safari-manual': 'Show Safari instructions',
+                        'desktop-quick-access': 'Save Circle AI for quick access'
+                    };
+                    label.textContent = labels[environment] || 'Install Circle AI';
+                }
+            }
         }
 
         function updateInstallModalContent(revealGuide = false) {
@@ -7164,7 +7212,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             }
 
             title.textContent = 'Keep Circle AI one tap away.';
-            benefits.textContent = 'Open Circle AI straight from your Home Screen or Dock. Fewer steps mean fewer distractions when you sit down to study, making it easier to return to your BBA resources and build a steady study routine.';
+            benefits.textContent = 'Open Circle AI straight from your Home Screen or computer. Fewer steps mean fewer distractions when you sit down to study, making it easier to return to your BBA resources and build a steady study routine.';
             button.dataset.installAction = environment === 'native' ? 'install' : (installGuideExpanded ? 'close' : 'guide');
 
             if (environment === 'native') {
@@ -7173,14 +7221,19 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 return;
             }
 
-            button.textContent = installGuideExpanded ? 'Got it' : 'Show me how';
+            const chromiumEnvironment = environment === 'chromium-android' || environment === 'chromium-desktop';
+            button.textContent = chromiumEnvironment && !installGuideExpanded
+                ? 'Install Circle AI'
+                : (installGuideExpanded ? 'Got it' : 'Show me how');
             const guideText = {
-                'ios-home-screen': '<strong>On iPhone or iPad</strong><ol><li>Open Circle AI in your browser.</li><li>Tap the Share button.</li><li>Choose <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>.</li></ol>',
-                'safari-dock': '<strong>In Safari on supported macOS versions</strong><ol><li>Open Circle AI in Safari.</li><li>Choose <strong>File → Add to Dock</strong>.</li><li>Confirm the name and select <strong>Add</strong>.</li><li>If you do not see Add to Dock, bookmark Circle AI instead.</li></ol>',
-                'firefox-android': '<strong>In Firefox on Android</strong><ol><li>Tap the three-dot menu.</li><li>Open <strong>More</strong>, then choose <strong>Add to Shortcuts</strong> or the available Home Screen option.</li></ol>',
-                'firefox-desktop': '<strong>In Firefox on a computer</strong><ol><li>Bookmark Circle AI with <strong>Ctrl+D</strong> (Windows/Linux) or <strong>⌘D</strong> (Mac).</li><li>For even quicker access, keep Circle AI open in a pinned tab.</li></ol>',
+                'ios-home-screen': '<strong>On iPhone or iPad</strong><ol><li>Open Circle AI in Safari.</li><li>Tap the Share button.</li><li>Choose <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>.</li></ol>',
+                'safari-dock': '<strong>In Safari on Mac</strong><ol><li>Open Circle AI in Safari.</li><li>Choose <strong>File → Add to Dock</strong>.</li><li>Confirm the name and select <strong>Add</strong>.</li><li>If that option is unavailable, bookmark Circle AI instead.</li></ol>',
+                'firefox-android': '<strong>In Firefox on Android</strong><ol><li>Tap the three-dot menu.</li><li>Choose the available <strong>Install</strong> or <strong>Add to Home Screen</strong> option. If neither appears, use <strong>Add to Shortcuts</strong> for quick access.</li></ol>',
+                'firefox-desktop': '<strong>In Firefox on a computer</strong><ol><li>Bookmark Circle AI with <strong>Ctrl+D</strong> (Windows/Linux) or <strong>⌘D</strong> (Mac).</li><li>For quicker access, keep Circle AI open in a pinned tab.</li></ol>',
+                'chromium-android': '<strong>In this Chromium browser on Android</strong><ol><li>Tap the browser menu (usually three dots).</li><li>Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>.</li><li>Confirm the installation. If a native install prompt becomes available, use <strong>Install Circle AI</strong> again.</li></ol>',
+                'chromium-desktop': '<strong>In this Chromium browser</strong><ol><li>Use <strong>Install Circle AI</strong> whenever the browser’s installation prompt is available.</li><li>If no prompt opens, look for the install icon in the address bar or open the browser menu and choose <strong>Install Circle AI</strong> or <strong>Install page as app</strong>.</li><li>Confirm the installation in the browser dialog.</li></ol>',
                 'android-manual': '<strong>On Android</strong><ol><li>Open the browser menu (usually three dots).</li><li>Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>, if available.</li><li>Follow the browser’s confirmation steps.</li></ol>',
-                'safari-manual': '<strong>In this browser</strong><ol><li>Open the browser’s Share or menu option.</li><li>Look for <strong>Add to Home Screen</strong> or a similar quick-access option.</li><li>Confirm the name and add it.</li></ol>',
+                'safari-manual': '<strong>In Safari</strong><ol><li>Tap or open the <strong>Share</strong> menu.</li><li>Choose <strong>Add to Home Screen</strong>, if available.</li><li>Confirm the name and tap <strong>Add</strong>.</li></ol>',
                 'desktop-quick-access': '<strong>On your computer</strong><ol><li>Bookmark Circle AI with <strong>Ctrl+D</strong> (Windows/Linux) or <strong>⌘D</strong> (Mac).</li><li>You can also pin the tab for easier access.</li></ol>'
             };
             instructions.innerHTML = guideText[environment] || guideText['desktop-quick-access'];
@@ -7189,8 +7242,12 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         function showInstallModal() {
             const modal = document.getElementById('install-modal');
-            installGuideExpanded = false;
-            updateInstallModalContent(false);
+            const environment = getInstallEnvironment();
+            // Remember whether this browser/device needs step-by-step guidance.
+            // On a future visit to this same browser profile, restore that guide.
+            const savedGuideChoice = getInstallStorage(CIRCLE_INSTALL_GUIDE_KEY) === 'true';
+            installGuideExpanded = environment !== 'native' && savedGuideChoice;
+            updateInstallModalContent(installGuideExpanded);
             modal.classList.remove('hidden');
             void modal.offsetWidth;
             modal.classList.add('show');
@@ -7216,7 +7273,9 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 deferredPrompt = null;
                 try {
                     installEvent.prompt();
-                    await installEvent.userChoice;
+                    const choice = await installEvent.userChoice;
+                    setInstallStorage('circle_v2_install_choice_v1', choice?.outcome === 'accepted' ? 'accepted-install' : 'dismissed-native-prompt');
+                    setInstallStorage('circle_v2_install_choice_environment_v1', getInstallEnvironment());
                 } catch (error) {
                     console.warn('Native installation prompt could not be opened:', error);
                 }
@@ -7225,7 +7284,8 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 return;
             }
 
-            // Non-Chromium browsers receive honest, OS- and browser-specific instructions.
+            // Keep this browser/device's guide preference for the next visit.
+            setInstallStorage(CIRCLE_INSTALL_GUIDE_KEY, 'true');
             updateInstallModalContent(true);
         }
 
@@ -10081,9 +10141,17 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             settingsCloseBtn.addEventListener('click', closeSettings);
             
             installBtn.addEventListener('click', showInstallModal);
-            installCloseBtn.addEventListener('click', closeInstallModal);
+            installCloseBtn.addEventListener('click', () => {
+                setInstallStorage('circle_v2_install_choice_v1', 'dismissed');
+                setInstallStorage('circle_v2_install_choice_environment_v1', getInstallEnvironment());
+                closeInstallModal();
+            });
             pwaInstallBtn.addEventListener('click', handleInstallClick);
-            installContinueBtn.addEventListener('click', closeInstallModal);
+            installContinueBtn.addEventListener('click', () => {
+                setInstallStorage('circle_v2_install_choice_v1', 'continue-without-installing');
+                setInstallStorage('circle_v2_install_choice_environment_v1', getInstallEnvironment());
+                closeInstallModal();
+            });
             
             shareBtn.addEventListener('click', handleShare);
             
