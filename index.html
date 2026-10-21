@@ -7080,6 +7080,9 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         // the next visit can restore the appropriate device/browser guidance.
         const CIRCLE_INSTALL_ENV_KEY = 'circle_v2_install_environment_v1';
         const CIRCLE_INSTALL_GUIDE_KEY = 'circle_v2_install_guide_expanded_v1';
+        // The browser signals a confirmed installation through appinstalled.
+        // This helps a later browser-tab visit remember that the app was installed.
+        const CIRCLE_INSTALL_CONFIRMED_KEY = 'circle_v2_pwa_install_confirmed_v1';
         function getInstallGuideStorageKey(environment) { return `${CIRCLE_INSTALL_GUIDE_KEY}_${environment}`; }
 
         function getInstallStorage(key) {
@@ -7100,6 +7103,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         window.addEventListener('appinstalled', () => {
             deferredPrompt = null;
+            setInstallStorage(CIRCLE_INSTALL_CONFIRMED_KEY, 'true');
             refreshInstallControls();
             closeInstallModal();
         });
@@ -7152,9 +7156,15 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             const device = getInstallDeviceInfo();
             const { isIOS, isAndroid, isFirefox, isSafari, isMac, isWindows, isChromeOS, isLinux, isChromium } = device;
             let environment;
-            if (isRunningAsInstalledPWA()) environment = 'installed';
-            else if (isIOS) environment = 'ios-home-screen';
+            if (isRunningAsInstalledPWA()) {
+                setInstallStorage(CIRCLE_INSTALL_CONFIRMED_KEY, 'true');
+                environment = 'installed';
+            }
+            // A newly available native prompt takes priority over a saved marker,
+            // allowing the UI to recover if the app was later removed.
             else if (deferredPrompt) environment = 'native';
+            else if (getInstallStorage(CIRCLE_INSTALL_CONFIRMED_KEY) === 'true') environment = 'installed-remembered';
+            else if (isIOS) environment = 'ios-home-screen';
             else if (isFirefox && isAndroid) environment = 'firefox-android';
             else if (isFirefox) environment = 'firefox-desktop';
             else if (isSafari && isMac) environment = 'safari-dock';
@@ -7183,9 +7193,9 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         }
 
         function rememberInstallEnvironment(environment) {
-            // Persist only the stable browser/OS profile. The native prompt can
-            // arrive later, so 'native' and 'installed' are transient states.
-            if (environment !== 'native' && environment !== 'installed') {
+            // Persist only the stable browser/OS profile. Native prompt and
+            // installed states are transient signals, not environment profiles.
+            if (!['native', 'installed', 'installed-remembered'].includes(environment)) {
                 setInstallStorage(CIRCLE_INSTALL_ENV_KEY, environment);
             }
             return environment;
@@ -7194,15 +7204,21 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         function refreshInstallControls() {
             const environment = getInstallEnvironment();
             const device = getInstallDeviceInfo();
-            const installed = environment === 'installed';
+            const runningInstalledApp = environment === 'installed';
+            const rememberedInstalledApp = environment === 'installed-remembered';
+            const installed = runningInstalledApp || rememberedInstalledApp;
             const installBtn = document.getElementById('install-btn');
             const moreInstall = document.getElementById('more-install');
             const showFloatingInstall = !installed && (environment === 'native' || environment === 'chromium-android' || environment === 'chromium-desktop');
             if (installBtn) installBtn.classList.toggle('hidden', !showFloatingInstall);
             if (moreInstall) {
-                moreInstall.classList.toggle('hidden', installed);
+                // The standalone app does not need an installation entry. In a
+                // browser tab, keep an entry so users can view the remembered state.
+                moreInstall.classList.toggle('hidden', runningInstalledApp);
                 const label = moreInstall.querySelector('.more-menu-label');
-                if (label && !installed) {
+                if (label && rememberedInstalledApp) {
+                    label.textContent = 'Circle AI is installed';
+                } else if (label && !runningInstalledApp) {
                     const labels = {
                         native: 'Install Circle AI',
                         'chromium-android': 'Install Circle AI',
@@ -7224,15 +7240,27 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             }
         }
 
+        function getInstalledLaunchLocation(device) {
+            if (device.isIOS) return 'your Home Screen';
+            if (device.isAndroid) return 'your Home Screen or app list';
+            if (device.isWindows) return 'the Start menu or Windows taskbar';
+            if (device.isMac) return 'the Dock or Applications folder';
+            if (device.isChromeOS) return 'the app launcher or shelf';
+            if (device.isLinux) return 'the app launcher';
+            return 'your device’s app launcher';
+        }
+
+        function getInstalledLaunchGuideText(device) {
+            const location = getInstalledLaunchLocation(device);
+            return `<strong>Recommended way to open the installed app</strong><ol><li>Find the Circle AI icon in ${location}.</li><li>Tap or click the icon to launch the app directly.</li><li>The button below opens Circle AI’s web address. Depending on your browser and device, it may open a browser tab rather than switch to the separate installed app. Using the device icon is the reliable way to launch the app.</li></ol>`;
+        }
+
         function getInstallBenefitText(environment, device, installed = false) {
-            if (installed) {
-                if (device.isIOS) return 'Circle AI is already installed on this device. Open it from your Home Screen whenever you are ready to study.';
-                if (device.isAndroid) return 'Circle AI is already installed or saved on this device. Open it from your Home Screen or app list whenever you are ready to study.';
-                if (device.isWindows) return 'Circle AI is already installed. Open it from the Start menu or the Windows taskbar whenever you are ready to study.';
-                if (device.isMac) return 'Circle AI is already installed. Open it from your Dock or Applications whenever you are ready to study.';
-                if (device.isChromeOS) return 'Circle AI is already installed. Open it from your launcher or shelf whenever you are ready to study.';
-                if (device.isLinux) return 'Circle AI is already installed. Open it from your app launcher whenever you are ready to study.';
-                return 'Circle AI is already installed. Open it from your device’s app launcher whenever you are ready to study.';
+            if (installed && environment === 'installed') {
+                return `Circle AI is already installed and you are using it as an app right now. For future study sessions, launch it from its icon in ${getInstalledLaunchLocation(device)} to go straight back to your BBA resources without searching for the webpage.`;
+            }
+            if (installed && environment === 'installed-remembered') {
+                return `Circle AI appears to have been installed from this browser profile before. For the smoothest experience, launch it from its icon in ${getInstalledLaunchLocation(device)}. If you have removed it, you can install it again from the browser’s app menu.`;
             }
             if (device.isIOS) return 'Keep Circle AI on your Home Screen so your BBA resources are only a tap away. Fewer steps make it easier to get started and return to studying regularly.';
             if (device.isAndroid) return 'Add Circle AI to your Home Screen or app list for quicker access to your BBA resources, with fewer distractions when it is time to study.';
@@ -7282,21 +7310,33 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
             const environment = getInstallEnvironment();
             const device = getInstallDeviceInfo();
+            const runningInstalledApp = environment === 'installed';
+            const rememberedInstalledApp = environment === 'installed-remembered';
+            const installed = runningInstalledApp || rememberedInstalledApp;
             installGuideExpanded = Boolean(revealGuide);
             instructions.hidden = !installGuideExpanded;
             fallback.style.display = 'none';
             fallback.textContent = '';
-            continueButton.classList.toggle('hidden', environment === 'installed');
-            continueButton.setAttribute('aria-hidden', environment === 'installed' ? 'true' : 'false');
+            continueButton.classList.toggle('hidden', installed);
+            continueButton.setAttribute('aria-hidden', installed ? 'true' : 'false');
 
-            benefits.textContent = getInstallBenefitText(environment, device, environment === 'installed');
+            benefits.textContent = getInstallBenefitText(environment, device, installed);
 
-            if (environment === 'installed') {
-                title.textContent = 'Circle AI is ready';
-                button.textContent = 'Done';
+            if (runningInstalledApp) {
+                title.textContent = 'Circle AI is already installed';
+                button.textContent = 'Open Circle AI';
                 button.dataset.installAction = 'close';
                 instructions.hidden = true;
                 instructions.innerHTML = '';
+                return;
+            }
+
+            if (rememberedInstalledApp) {
+                title.textContent = 'Circle AI appears to be installed';
+                button.textContent = 'Open Circle AI';
+                button.dataset.installAction = 'open-installed';
+                instructions.innerHTML = getInstalledLaunchGuideText(device);
+                instructions.hidden = false;
                 return;
             }
 
@@ -7343,7 +7383,31 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         async function handleInstallClick() {
             const environment = getInstallEnvironment();
-            if (environment === 'installed' || document.getElementById('pwa-install-btn')?.dataset.installAction === 'close') {
+            const installAction = document.getElementById('pwa-install-btn')?.dataset.installAction;
+
+            if (installAction === 'open-installed' || environment === 'installed-remembered') {
+                // Browsers do not provide one universal API to switch from a
+                // normal tab into its separately installed PWA. Open the site's
+                // entry URL as a best-effort action and keep the icon instructions
+                // visible if a popup is blocked.
+                let openedWindow = null;
+                try {
+                    openedWindow = window.open(window.location.href, '_blank');
+                    if (openedWindow) openedWindow.opener = null;
+                } catch (_) { /* Use the on-screen device-icon guidance below. */ }
+                if (openedWindow) {
+                    closeInstallModal();
+                } else {
+                    const fallback = document.getElementById('install-fallback-msg');
+                    if (fallback) {
+                        fallback.textContent = `If Circle AI opens in a browser tab, launch the installed app from its icon in ${getInstalledLaunchLocation(getInstallDeviceInfo())}.`;
+                        fallback.style.display = 'block';
+                    }
+                }
+                return;
+            }
+
+            if (environment === 'installed' || installAction === 'close') {
                 closeInstallModal();
                 return;
             }
