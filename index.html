@@ -179,123 +179,6 @@
             opacity: 1 !important;
         }
 
-        /* Promotional Modal Styles */
-        #promo-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-        #promo-modal.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .promo-content {
-            position: relative;
-            width: 90vw;
-            max-width: 400px;
-            aspect-ratio: 4/5;
-            max-height: 85vh;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-            background: #080808;
-        }
-        .promo-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        
-        /* Modal X Button with 3s Countdown */
-        #promo-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 300;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 20;
-            transition: background 0.3s ease, border-color 0.3s ease;
-            pointer-events: auto;
-            padding: 0;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #promo-close.promo-disabled {
-            pointer-events: none;
-            background: rgba(255, 255, 255, 0.02);
-            border-color: rgba(255, 255, 255, 0.05);
-        }
-        #promo-close:not(.promo-disabled):hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-        .promo-ring {
-            position: absolute;
-            top: -1px; left: -1px;
-            width: 40px; height: 40px;
-            /* scaleX(-1) mirrors it so clockwise animation acts anti-clockwise */
-            transform: scaleX(-1) rotate(-90deg);
-            pointer-events: none;
-        }
-        .promo-ring-progress {
-            /* Circumference of r=18 is ~113.1 */
-            stroke-dasharray: 113.1;
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 0.1s linear;
-        }
-        @keyframes ring-erase {
-            to { stroke-dashoffset: 113.1; }
-        }
-
-        /* Modal LinkedIn CTA */
-        .promo-linkedin-btn {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            padding: 12px 28px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-size: 15px;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-            z-index: 20;
-            pointer-events: auto;
-        }
-        .promo-linkedin-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(-50%) scale(1.02);
-        }
-
         /* Onboarding Sequence Styles */
         #onboarding-layer {
             position: fixed;
@@ -1332,7 +1215,6 @@
             .anim-enter, .anim-exit { transform: none !important; filter: none !important; }
             .glow-spinner { animation: none !important; background: rgba(255,255,255,0.1); }
             .thinking-dot { animation: none !important; opacity: 0.7; }
-            .promo-ring-progress { animation: none !important; stroke-dashoffset: 113.1 !important; }
             .dl-box { transition: none !important; }
         }
 
@@ -6480,6 +6362,30 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 #install-modal .install-fallback-msg { display: none !important; }
 </style>
 
+
+<style id="circle-brand-touch-focus-fix">
+/* Prevent the unwanted touch/focus box on the Circle AI logo only.
+   Keep focus behaviour for the rest of the interface unchanged. */
+#app-shell-header #circle-brand-home,
+#app-shell-header #circle-brand-home:focus,
+#app-shell-header #circle-brand-home:focus-visible,
+#app-shell-header .shell-brand-main:active,
+#app-shell-header .shell-brand-main:focus,
+#app-shell-header .shell-brand-main:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-appearance: none;
+    appearance: none;
+}
+#app-shell-header #circle-brand-home img,
+#app-shell-header .shell-brand-main img {
+    outline: none !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+</style>
 </head>
 <body>
 
@@ -6536,20 +6442,6 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             <h1 id="intro-welcome" class="font-ui anim-element anim-enter hidden"></h1>
         </div>
 
-        <!-- Promotional Modal -->
-        <div id="promo-modal" class="hidden font-ui">
-            <div class="promo-content">
-                <button id="promo-close" class="promo-disabled" aria-disabled="true">
-                    <svg class="promo-ring" viewBox="0 0 40 40">
-                        <circle class="promo-ring-progress" cx="20" cy="20" r="18" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"/>
-                    </svg>
-                    <span class="promo-x">×</span>
-                </button>
-                <img data-src="circle-promo.png" alt="Promotional Content" class="promo-image" loading="lazy" decoding="async">
-                <a href="https://www.linkedin.com/in/satyaprakashsamal/" target="_blank" rel="noopener noreferrer" class="promo-linkedin-btn font-ui">Follow on LinkedIn</a>
-            </div>
-        </div>
-        
         <!-- Settings Modal -->
         <div id="settings-modal" class="hidden">
             <div class="settings-content">
@@ -6567,17 +6459,6 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 </div>
                 <div class="settings-desc">
                     Circle AI respects your privacy. Allow your prompts to be saved and used to improve Circle AI. Turn this off to opt out of prompt storage and training.
-                </div>
-                
-                <div class="settings-row" style="margin-top: 24px;">
-                    <span>Show Circle AI Banner</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="promo-banner-toggle" aria-label="Show Circle AI Banner" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="settings-desc" style="margin-bottom: 28px;">
-                    Show the Circle AI promotional banner once when you send your first prompt in a new session.
                 </div>
                 
                 <div class="settings-row" style="margin-top: 24px;">
@@ -7252,7 +7133,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
         function getInstalledLaunchGuideText(device) {
             const location = getInstalledLaunchLocation(device);
-            return `<strong>Recommended way to open the installed app</strong><ol><li>Find the Circle AI icon in ${location}.</li><li>Tap or click the icon to launch the app directly.</li><li>The button below opens Circle AI’s web address. Depending on your browser and device, it may open a browser tab rather than switch to the separate installed app. Using the device icon is the reliable way to launch the app.</li></ol>`;
+            return `<strong>Recommended way to open the installed app</strong><ol><li>Find the Circle AI icon in ${location}.</li><li>Tap or click that icon to launch the installed app directly.</li><li>For future study sessions, use the device icon rather than a browser bookmark, which may open the website in a separate tab.</li></ol>`;
         }
 
         function getInstallBenefitText(environment, device, installed = false) {
@@ -7319,12 +7200,14 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
             fallback.textContent = '';
             continueButton.classList.toggle('hidden', installed);
             continueButton.setAttribute('aria-hidden', installed ? 'true' : 'false');
+            button.classList.toggle('hidden', installed);
+            button.setAttribute('aria-hidden', installed ? 'true' : 'false');
+            button.disabled = installed;
 
             benefits.textContent = getInstallBenefitText(environment, device, installed);
 
             if (runningInstalledApp) {
                 title.textContent = 'Circle AI is already installed';
-                button.textContent = 'Open Circle AI';
                 button.dataset.installAction = 'close';
                 instructions.hidden = true;
                 instructions.innerHTML = '';
@@ -7333,8 +7216,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
 
             if (rememberedInstalledApp) {
                 title.textContent = 'Circle AI appears to be installed';
-                button.textContent = 'Open Circle AI';
-                button.dataset.installAction = 'open-installed';
+                button.dataset.installAction = 'close';
                 instructions.innerHTML = getInstalledLaunchGuideText(device);
                 instructions.hidden = false;
                 return;
@@ -7384,28 +7266,6 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         async function handleInstallClick() {
             const environment = getInstallEnvironment();
             const installAction = document.getElementById('pwa-install-btn')?.dataset.installAction;
-
-            if (installAction === 'open-installed' || environment === 'installed-remembered') {
-                // Browsers do not provide one universal API to switch from a
-                // normal tab into its separately installed PWA. Open the site's
-                // entry URL as a best-effort action and keep the icon instructions
-                // visible if a popup is blocked.
-                let openedWindow = null;
-                try {
-                    openedWindow = window.open(window.location.href, '_blank');
-                    if (openedWindow) openedWindow.opener = null;
-                } catch (_) { /* Use the on-screen device-icon guidance below. */ }
-                if (openedWindow) {
-                    closeInstallModal();
-                } else {
-                    const fallback = document.getElementById('install-fallback-msg');
-                    if (fallback) {
-                        fallback.textContent = `If Circle AI opens in a browser tab, launch the installed app from its icon in ${getInstalledLaunchLocation(getInstallDeviceInfo())}.`;
-                        fallback.style.display = 'block';
-                    }
-                }
-                return;
-            }
 
             if (environment === 'installed' || installAction === 'close') {
                 closeInstallModal();
@@ -8600,8 +8460,6 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
         const GREETING_HIDDEN_MS = 2000;
         let isChatMode = false;
         let isProcessing = false;
-        let promoTimer = null;
-        let promoBannerConsent = true; // Added live consent tracking
         let circleReturningUser = false;
 
         /* Unified shell + Learn state */
@@ -8709,16 +8567,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             }
         };
         
-        // Track promo shown in session storage instead of window scope
-        // This ensures the logic holds across manual refreshes but resets per new tab/session.
-        function setPromoShownInSession() {
-            sessionStorage.setItem('circleV2PromoShownSession', 'true');
-        }
-        function hasPromoBeenShownInSession() {
-            return sessionStorage.getItem('circleV2PromoShownSession') === 'true';
-        }
-
-        const sleep = ms => new Promise(r => setTimeout(r, ms));
+                const sleep = ms => new Promise(r => setTimeout(r, ms));
 
         function formatText(text, name) {
             if (name) {
@@ -8811,12 +8660,6 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             const improveToggleEl = document.getElementById('improve-circle-toggle');
             improveToggleEl.checked = savedImproveSetting === 'true';
             
-            // Show Banner Preference
-            const savedPromoSetting = getPreference('circleShowPromoBanner', 'true');
-            promoBannerConsent = (savedPromoSetting === 'true'); // Live sync
-            const promoToggleEl = document.getElementById('promo-banner-toggle');
-            promoToggleEl.checked = promoBannerConsent;
-
             // Model Selection Preference. The earlier build saved "core" as its default,
             // so apply this one-time migration to Swift unless the user changes models again.
             let currentModel = getPreference('circleSelectedModel', 'swift');
@@ -9332,48 +9175,6 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             }, GREETING_HOLD_MS);
         }
 
-
-        /*******************************************************
-         * 6. PROMOTIONAL POPUP LOGIC
-         *******************************************************/
-        function showPromoModal() {
-            const modal = document.getElementById('promo-modal');
-            const promoImage = modal ? modal.querySelector('.promo-image') : null;
-            if (promoImage && !promoImage.getAttribute('src')) {
-                promoImage.setAttribute('src', promoImage.dataset.src || 'circle-promo.png');
-            }
-            const closeBtn = document.getElementById('promo-close');
-            const ring = document.querySelector('.promo-ring-progress');
-            
-            modal.classList.remove('hidden');
-            void modal.offsetWidth;
-            modal.classList.add('show');
-            
-            closeBtn.classList.add('promo-disabled');
-            closeBtn.setAttribute('aria-disabled', 'true');
-            
-            ring.style.display = 'block';
-            ring.style.animation = 'none';
-            void ring.offsetWidth;
-            ring.style.animation = 'ring-erase 3s linear forwards';
-            
-            if (promoTimer) clearTimeout(promoTimer);
-            
-            promoTimer = setTimeout(() => {
-                closeBtn.classList.remove('promo-disabled');
-                closeBtn.setAttribute('aria-disabled', 'false');
-                ring.style.display = 'none';
-            }, 3000);
-        }
-
-        function closePromoModal() {
-            const modal = document.getElementById('promo-modal');
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                if (promoTimer) clearTimeout(promoTimer);
-            }, 500);
-        }
 
         /*******************************************************
          * 6.5 SETTINGS LOGIC
@@ -10252,14 +10053,10 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
                 chatInput.addEventListener('input', syncAskUtilityVisibility);
                 syncAskUtilityVisibility();
             }
-            const promoCloseBtn = document.getElementById('promo-close');
-            
-            const settingsBtn = document.getElementById('settings-btn');
+const settingsBtn = document.getElementById('settings-btn');
             const settingsCloseBtn = document.getElementById('settings-close');
             const improveToggle = document.getElementById('improve-circle-toggle');
-            const promoBannerToggle = document.getElementById('promo-banner-toggle');
-            
-            const installBtn = document.getElementById('install-btn');
+const installBtn = document.getElementById('install-btn');
             const installCloseBtn = document.getElementById('install-close');
             const pwaInstallBtn = document.getElementById('pwa-install-btn');
             const installContinueBtn = document.getElementById('install-continue-btn');
@@ -10279,9 +10076,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             });
 
             newChatBtn.addEventListener('click', startNewChat);
-            promoCloseBtn.addEventListener('click', closePromoModal);
-            
-            settingsBtn.addEventListener('click', toggleSettings);
+settingsBtn.addEventListener('click', toggleSettings);
             settingsCloseBtn.addEventListener('click', closeSettings);
             
             installBtn.addEventListener('click', showInstallModal);
@@ -10307,16 +10102,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
                 setPreference('circleImproveEnabled', e.target.checked ? 'true' : 'false');
             });
             
-            promoBannerToggle.addEventListener('change', (e) => {
-                promoBannerConsent = e.target.checked;
-                setPreference('circleShowPromoBanner', promoBannerConsent ? 'true' : 'false');
-                if (!promoBannerConsent) {
-                    if (promoTimer) clearTimeout(promoTimer);
-                    closePromoModal(); // Hide safely if it's currently showing
-                }
-            });
-            
-            // Model menu interactions
+            // Model menu interactions            // Model menu interactions
             const modelBtnChevron = document.getElementById('model-btn-chevron');
             const chevronDown = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 9.5L12 14.5L17 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
             const chevronUp = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 14.5L12 9.5L17 14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -10532,27 +10318,6 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             chatInput.value = "";
             stopGreetingRotation();
             
-            // Check promo banner setting
-            const consent = promoBannerConsent === true && getPreference('circleShowPromoBanner', 'true') === 'true';
-            const alreadyShown = sessionStorage.getItem('circleV2PromoShownSession') === 'true';
-            
-            // Show promotional poster ONCE per session on first prompt IF setting is ON
-            if (consent && !alreadyShown) {
-                if (promoTimer) clearTimeout(promoTimer);
-                promoTimer = setTimeout(() => {
-                    // Double check preference in case it was toggled during the timeout
-                    const finalConsent = promoBannerConsent === true && getPreference('circleShowPromoBanner', 'true') === 'true';
-                    if (!finalConsent) {
-                        return;
-                    }
-                    if (sessionStorage.getItem('circleV2PromoShownSession') === 'true') {
-                        return;
-                    }
-                    sessionStorage.setItem('circleV2PromoShownSession', 'true');
-                    showPromoModal();
-                }, 1500); 
-            }
-
             if (!isChatMode) {
                 document.body.classList.add('chat-active');
                 document.getElementById('glow-spinner-elem').classList.remove('glow-spinner-reset');
@@ -12341,6 +12106,7 @@ setInterval(() => {
         const CIRCLE_DONATION_SUPPORT_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
         const CIRCLE_DONATION_SUPPORT_ENGAGEMENT_MS = 5000;
         let circleDonationAmount = CIRCLE_DONATION_DEFAULT_AMOUNT;
+        let circleDonationMinimumInputTimer = null;
         let circleDonationNudgeTimer = null;
         let circleDonationSupportEngagementTimer = null;
         let circleDonationSupportEngagementPending = false;
@@ -12477,6 +12243,10 @@ setInterval(() => {
         function updateDonationAmount(amount, options = {}) {
             const value = Math.round(Number(amount));
             if (!Number.isFinite(value) || value < CIRCLE_DONATION_MIN_AMOUNT || value > CIRCLE_DONATION_MAX_AMOUNT) return;
+            if (circleDonationMinimumInputTimer) {
+                clearTimeout(circleDonationMinimumInputTimer);
+                circleDonationMinimumInputTimer = null;
+            }
             circleDonationAmount = value;
 
             const presetButton = Array.from(document.querySelectorAll('.donation-amount-btn'))
@@ -12504,8 +12274,7 @@ setInterval(() => {
         }
 
         function showDonationMinimumToast() {
-            const name = String(userName || '').trim();
-            showToast(`${name ? `${name}, ` : ''}thank you for your kindness 🫶 The minimum donation amount is ₹10.`, 5000);
+            showToast('Satya, thank you for your kindness 🫶 The minimum donation amount is ₹10.', 5000);
         }
 
         function openDonationModal(fromNudge = false) {
@@ -12853,7 +12622,12 @@ setInterval(() => {
                     }
                 });
 
-                custom.addEventListener('input', () => {
+                custom.addEventListener('input', (event) => {
+                    if (circleDonationMinimumInputTimer) {
+                        clearTimeout(circleDonationMinimumInputTimer);
+                        circleDonationMinimumInputTimer = null;
+                    }
+
                     const raw = custom.value;
                     if (/[^0-9]/.test(raw)) {
                         custom.value = raw.replace(/[^0-9]/g, '');
@@ -12869,11 +12643,46 @@ setInterval(() => {
                         showDonationMaxLimitToast();
                         return;
                     }
-                    if (value >= CIRCLE_DONATION_MIN_AMOUNT) updateDonationAmount(value, { keepCustomValue: true });
-                    /* Values below ₹10 are clamped when the field loses focus. */
+
+                    if (value < CIRCLE_DONATION_MIN_AMOUNT) {
+                        // For normal typing, briefly allow the next digit so values
+                        // such as 100 can be entered without the first digit becoming 10.
+                        const completedReplacement = event.inputType === 'insertFromPaste' || event.inputType === 'insertReplacementText';
+                        const clampMinimum = () => {
+                            circleDonationMinimumInputTimer = null;
+                            const currentValue = Number(custom.value);
+                            if (custom.value.trim() !== '' && Number.isFinite(currentValue) && currentValue < CIRCLE_DONATION_MIN_AMOUNT) {
+                                custom.value = String(CIRCLE_DONATION_MIN_AMOUNT);
+                                updateDonationAmount(CIRCLE_DONATION_MIN_AMOUNT, { keepCustomValue: true });
+                                showDonationMinimumToast();
+                            }
+                        };
+                        if (completedReplacement) clampMinimum();
+                        else circleDonationMinimumInputTimer = setTimeout(clampMinimum, 500);
+                        return;
+                    }
+
+                    updateDonationAmount(value, { keepCustomValue: true });
+                });
+
+                custom.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Enter' || custom.value.trim() === '') return;
+                    const value = Number(custom.value);
+                    if (Number.isFinite(value) && value < CIRCLE_DONATION_MIN_AMOUNT) {
+                        event.preventDefault();
+                        if (circleDonationMinimumInputTimer) clearTimeout(circleDonationMinimumInputTimer);
+                        circleDonationMinimumInputTimer = null;
+                        custom.value = String(CIRCLE_DONATION_MIN_AMOUNT);
+                        updateDonationAmount(CIRCLE_DONATION_MIN_AMOUNT, { keepCustomValue: true });
+                        showDonationMinimumToast();
+                    }
                 });
 
                 custom.addEventListener('blur', () => {
+                    if (circleDonationMinimumInputTimer) {
+                        clearTimeout(circleDonationMinimumInputTimer);
+                        circleDonationMinimumInputTimer = null;
+                    }
                     if (custom.value.trim() === '') return;
                     const value = Number(custom.value);
                     if (!Number.isFinite(value) || value < CIRCLE_DONATION_MIN_AMOUNT) {
