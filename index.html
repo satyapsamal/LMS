@@ -6396,7 +6396,89 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
     }
 </style>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
+
+<style id="circle-ai-smooth-loading-and-install-ui">
+/* Smooth Learn playlist thumbnail loading: skeleton and image share the exact same 16:9 box. */
+.learn-thumb,
+.learn-thumb-skeleton-only {
+    background: #242424 !important;
+    isolation: isolate;
+}
+.learn-thumb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, #222 8%, #343434 18%, #252525 33%);
+    background-size: 220% 100%;
+    animation: circleThumbSkeletonShimmer 1.35s ease-in-out infinite;
+    opacity: 1;
+    transition: opacity .2s ease;
+}
+.learn-thumb.thumbnail-loaded::before { opacity: 0; animation: none; }
+.learn-thumb img {
+    position: relative;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity .22s ease;
+    background: transparent !important;
+}
+.learn-thumb img:not(.image-loaded) { opacity: 0 !important; }
+.learn-thumb img.image-loaded { opacity: 1 !important; }
+.learn-thumb.completed img.image-loaded { opacity: .62 !important; }
+.learn-thumb.active::after { z-index: 2; }
+.learn-thumb-skeleton-only { cursor: default; pointer-events: none; }
+@keyframes circleThumbSkeletonShimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -120% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .learn-thumb::before { animation: none; background: #292929; }
+}
+
+/* Use the real Circle AI app icon in the installation guide. */
+#install-modal .install-img {
+    display: block;
+    width: 72px;
+    height: 72px;
+    max-width: 72px;
+    margin: 0 auto 16px;
+    object-fit: contain;
+    border: 0;
+    border-radius: 18px;
+    background: transparent;
+}
+#install-modal .install-instructions {
+    margin: 12px 0 4px;
+    padding: 13px 14px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 12px;
+    background: rgba(255,255,255,.035);
+    color: #d0d0d0;
+    font: 12px/1.65 var(--font-conversational);
+    text-align: left;
+}
+#install-modal .install-instructions[hidden] { display: none !important; }
+#install-modal .install-instructions ol { margin: 8px 0 0 18px; padding: 0; }
+#install-modal .install-instructions li { margin: 4px 0; }
+#install-modal .install-instructions strong { color: #fff; font-weight: 600; }
+#install-modal .install-continue-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 11px 12px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 24px;
+    color: #a8a8a8;
+    background: transparent;
+    font: 500 12px var(--font-conversational);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+#install-modal .install-continue-btn:hover { color: #fff; background: rgba(255,255,255,.045); }
+#install-modal .install-fallback-msg { display: none !important; }
+</style>
 
 </head>
 <body>
@@ -6463,7 +6545,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     </svg>
                     <span class="promo-x">×</span>
                 </button>
-                <img src="circle-promo.png" alt="Promotional Content" class="promo-image">
+                <img data-src="circle-promo.png" alt="Promotional Content" class="promo-image" loading="lazy" decoding="async">
                 <a href="https://www.linkedin.com/in/satyaprakashsamal/" target="_blank" rel="noopener noreferrer" class="promo-linkedin-btn font-ui">Follow on LinkedIn</a>
             </div>
         </div>
@@ -6523,14 +6605,15 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                     <button id="install-close" class="settings-close" aria-label="Close Install">×</button>
                 </div>
                 
-                <img src="circle-promo.png" alt="Circle AI Promo" class="install-img">
+                <img src="circle.png" alt="Circle AI logo" class="install-img" width="72" height="72" loading="lazy" decoding="async">
                 
-                <div class="settings-desc" style="margin-bottom: 16px;">
-                    Your BBA assistant, now on your device.<br>Quick access, completely free, lightweight, and safe.
+                <div id="install-benefits" class="settings-desc" style="margin-bottom: 16px;">
+                    Open Circle AI straight from your Home Screen or Dock. Fewer steps mean fewer distractions when you sit down to study, making it easier to return to your BBA resources and build a steady study routine.
                 </div>
-                
-                <button id="pwa-install-btn" class="install-action-btn">Install (2KB)</button>
-                <div id="install-fallback-msg" class="install-fallback-msg">Installation is currently unavailable in this browser.</div>
+                <div id="install-instructions" class="install-instructions" hidden aria-live="polite"></div>
+                <div id="install-fallback-msg" class="install-fallback-msg" role="status"></div>
+                <button id="pwa-install-btn" class="install-action-btn" type="button">Install Circle AI</button>
+                <button id="install-continue-btn" class="install-continue-btn" type="button">Continue without installing</button>
             </div>
         </div>
 
@@ -6863,7 +6946,7 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
                 </button>
                 <div style="position: relative;">
                     <button id="model-btn" class="floating-btn hidden" aria-label="Select AI model">
-                        <span id="model-btn-label">Circle AI Core</span>
+                        <span id="model-btn-label">Circle AI Swift</span>
                         <span id="model-btn-chevron">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 9.5L12 14.5L17 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </span>
@@ -6991,35 +7074,126 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         /*******************************************************
          * PWA INSTALLATION LOGIC
          *******************************************************/
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const pwaInstalled = localStorage.getItem('circle_pwa_installed') === 'true';
-            // Only show install button if not already in standalone mode and not previously installed
-            if (!isRunningAsInstalledPWA() && !pwaInstalled) {
-                document.getElementById('install-btn').classList.remove('hidden');
-            }
+        let deferredPrompt = null;
+        let installGuideExpanded = false;
+
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+            deferredPrompt = event;
+            refreshInstallControls();
+            if (document.getElementById('install-modal')?.classList.contains('show')) updateInstallModalContent();
         });
 
         window.addEventListener('appinstalled', () => {
-            localStorage.setItem('circle_pwa_installed', 'true');
             deferredPrompt = null;
-            document.getElementById('install-btn').classList.add('hidden');
+            refreshInstallControls();
             closeInstallModal();
         });
 
         function isRunningAsInstalledPWA() {
-            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                window.matchMedia('(display-mode: minimal-ui)').matches ||
+                window.navigator.standalone === true;
+        }
+
+        function refreshInstallControls() {
+            const installed = isRunningAsInstalledPWA();
+            const installBtn = document.getElementById('install-btn');
+            const moreInstall = document.getElementById('more-install');
+            if (installBtn) installBtn.classList.toggle('hidden', installed || !deferredPrompt);
+            if (moreInstall) {
+                moreInstall.classList.toggle('hidden', installed);
+                const label = moreInstall.querySelector('.more-menu-label');
+                if (label && !installed) {
+                    const environment = getInstallEnvironment();
+                    const labels = {
+                        native: 'Install Circle AI',
+                        'ios-home-screen': 'Add to Home Screen',
+                        'safari-dock': 'Add Circle AI to Dock',
+                        'firefox-android': 'Add Circle AI shortcut',
+                        'firefox-desktop': 'Save Circle AI for quick access',
+                        'android-manual': 'Install / quick access',
+                        'safari-manual': 'Save Circle AI for quick access',
+                        'desktop-quick-access': 'Save Circle AI for quick access'
+                    };
+                    label.textContent = labels[environment] || 'Install Circle AI';
+                }
+            }
+        }
+
+        function getInstallEnvironment() {
+            const ua = navigator.userAgent || '';
+            const isIOS = /iPad|iPhone|iPod/i.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isAndroid = /Android/i.test(ua);
+            const isFirefox = /Firefox|FxiOS/i.test(ua);
+            const isSafari = /Safari/i.test(ua) && !/Chrome|CriOS|Edg|FxiOS|Firefox|OPR|Android/i.test(ua);
+            const isMac = /Macintosh|Mac OS X/i.test(ua) && !isIOS;
+            if (isRunningAsInstalledPWA()) return 'installed';
+            if (deferredPrompt) return 'native';
+            if (isIOS) return 'ios-home-screen';
+            if (isSafari && isMac) return 'safari-dock';
+            if (isFirefox && isAndroid) return 'firefox-android';
+            if (isFirefox) return 'firefox-desktop';
+            if (isAndroid) return 'android-manual';
+            if (isSafari) return 'safari-manual';
+            return 'desktop-quick-access';
+        }
+
+        function updateInstallModalContent(revealGuide = false) {
+            const title = document.querySelector('#install-modal .settings-header > span');
+            const benefits = document.getElementById('install-benefits');
+            const instructions = document.getElementById('install-instructions');
+            const button = document.getElementById('pwa-install-btn');
+            const fallback = document.getElementById('install-fallback-msg');
+            if (!title || !benefits || !instructions || !button || !fallback) return;
+
+            const environment = getInstallEnvironment();
+            installGuideExpanded = Boolean(revealGuide);
+            instructions.hidden = !installGuideExpanded;
+            fallback.style.display = 'none';
+            fallback.textContent = '';
+
+            if (environment === 'installed') {
+                title.textContent = 'Circle AI is ready';
+                benefits.textContent = 'You are already using Circle AI as an app. Open it from your Home Screen, Dock, or app launcher whenever you want to study.';
+                button.textContent = 'Done';
+                button.dataset.installAction = 'close';
+                instructions.hidden = true;
+                return;
+            }
+
+            title.textContent = 'Keep Circle AI one tap away.';
+            benefits.textContent = 'Open Circle AI straight from your Home Screen or Dock. Fewer steps mean fewer distractions when you sit down to study, making it easier to return to your BBA resources and build a steady study routine.';
+            button.dataset.installAction = environment === 'native' ? 'install' : (installGuideExpanded ? 'close' : 'guide');
+
+            if (environment === 'native') {
+                button.textContent = 'Install Circle AI';
+                instructions.hidden = true;
+                return;
+            }
+
+            button.textContent = installGuideExpanded ? 'Got it' : 'Show me how';
+            const guideText = {
+                'ios-home-screen': '<strong>On iPhone or iPad</strong><ol><li>Open Circle AI in your browser.</li><li>Tap the Share button.</li><li>Choose <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>.</li></ol>',
+                'safari-dock': '<strong>In Safari on supported macOS versions</strong><ol><li>Open Circle AI in Safari.</li><li>Choose <strong>File → Add to Dock</strong>.</li><li>Confirm the name and select <strong>Add</strong>.</li><li>If you do not see Add to Dock, bookmark Circle AI instead.</li></ol>',
+                'firefox-android': '<strong>In Firefox on Android</strong><ol><li>Tap the three-dot menu.</li><li>Open <strong>More</strong>, then choose <strong>Add to Shortcuts</strong> or the available Home Screen option.</li></ol>',
+                'firefox-desktop': '<strong>In Firefox on a computer</strong><ol><li>Bookmark Circle AI with <strong>Ctrl+D</strong> (Windows/Linux) or <strong>⌘D</strong> (Mac).</li><li>For even quicker access, keep Circle AI open in a pinned tab.</li></ol>',
+                'android-manual': '<strong>On Android</strong><ol><li>Open the browser menu (usually three dots).</li><li>Choose <strong>Install app</strong> or <strong>Add to Home Screen</strong>, if available.</li><li>Follow the browser’s confirmation steps.</li></ol>',
+                'safari-manual': '<strong>In this browser</strong><ol><li>Open the browser’s Share or menu option.</li><li>Look for <strong>Add to Home Screen</strong> or a similar quick-access option.</li><li>Confirm the name and add it.</li></ol>',
+                'desktop-quick-access': '<strong>On your computer</strong><ol><li>Bookmark Circle AI with <strong>Ctrl+D</strong> (Windows/Linux) or <strong>⌘D</strong> (Mac).</li><li>You can also pin the tab for easier access.</li></ol>'
+            };
+            instructions.innerHTML = guideText[environment] || guideText['desktop-quick-access'];
+            if (installGuideExpanded) instructions.hidden = false;
         }
 
         function showInstallModal() {
             const modal = document.getElementById('install-modal');
+            installGuideExpanded = false;
+            updateInstallModalContent(false);
             modal.classList.remove('hidden');
             void modal.offsetWidth;
             modal.classList.add('show');
-            
-            document.getElementById('install-fallback-msg').style.display = 'none';
         }
 
         function closeInstallModal() {
@@ -7031,22 +7205,28 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         }
 
         async function handleInstallClick() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
-                    localStorage.setItem('circle_pwa_installed', 'true');
-                    document.getElementById('install-btn').classList.add('hidden');
-                } else {
-                    console.log('User dismissed the install prompt');
-                }
-                deferredPrompt = null;
+            const environment = getInstallEnvironment();
+            if (environment === 'installed' || document.getElementById('pwa-install-btn')?.dataset.installAction === 'close') {
                 closeInstallModal();
-            } else {
-                // Show fallback message
-                document.getElementById('install-fallback-msg').style.display = 'block';
+                return;
             }
+
+            if (deferredPrompt) {
+                const installEvent = deferredPrompt;
+                deferredPrompt = null;
+                try {
+                    installEvent.prompt();
+                    await installEvent.userChoice;
+                } catch (error) {
+                    console.warn('Native installation prompt could not be opened:', error);
+                }
+                refreshInstallControls();
+                closeInstallModal();
+                return;
+            }
+
+            // Non-Chromium browsers receive honest, OS- and browser-specific instructions.
+            updateInstallModalContent(true);
         }
 
         /*******************************************************
@@ -7192,7 +7372,11 @@ body.circle-ask-mode #learn-layer .circle-learn-disclaimer {
         /*******************************************************
          * 2. KNOWLEDGE BASE & INTENTS (Hardcoded Local Data)
          *******************************************************/
-        const knowledgeBase = [
+        /* Ask data is constructed only when the user opens Ask. This keeps the
+         * default Learn visit from allocating and indexing the full intent database. */
+        let knowledgeBase = null;
+        function createKnowledgeBase() {
+            return [
             {
                 id: 'what_is_circle',
                 category: 'Circle AI Tool',
@@ -7852,6 +8036,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
                 markdown: `See you, {{Name}}. Good luck with your preparation.`
             }
         ];
+        }
 
         const fallbackResponse = {
             markdown: `{{Name}}, I don't have enough verified information to answer that reliably.\n\nI don't want to guess and give you incorrect information.\n\nFor questions outside my current knowledge base, you can also ask the student community at **[BBA Circle](https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My)**, where students share resources, discuss academics, participate in revision sessions, and help each other out.`,
@@ -7906,33 +8091,40 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             { text: 'Want to join BBA Circle?', url: 'https://chat.whatsapp.com/HPvD6l3vpgkF9ABUZXS3My' }
         ];
 
-        // Only use prompts that the live intent matcher resolves to their own answer.
-        // This prevents carousel prompts from pointing to the fallback or a different intent.
-        const categorizedSuggestions = {};
-        knowledgeBase.forEach(intent => {
-            const eligiblePrompts = (intent.suggestionPool || []).filter(prompt => {
-                try {
-                    return matchIntent(prompt).intentId === intent.id;
-                } catch (_) {
-                    return false;
-                }
-            });
-            if (eligiblePrompts.length > 0) {
-                if (!categorizedSuggestions[intent.category]) {
-                    categorizedSuggestions[intent.category] = [];
-                }
-                categorizedSuggestions[intent.category].push(...eligiblePrompts);
-            }
-        });
-
-        const availableCategories = Object.keys(categorizedSuggestions);
-        // Prioritise current End-Term syllabus prompts in the random carousel.
-        const weightedSuggestionCategories = availableCategories.flatMap(category =>
-            category === 'End-Term Syllabus' ? [category, category, category] : [category]
-        );
-        
+        // Suggestion data is also created lazily, together with the Ask intent database.
+        let categorizedSuggestions = {};
+        let availableCategories = [];
+        let weightedSuggestionCategories = [];
         let lastCategory = null;
         let recentPrompts = [];
+
+        function ensureAskDataLoaded() {
+            if (knowledgeBase !== null) return;
+            knowledgeBase = createKnowledgeBase();
+            categorizedSuggestions = {};
+
+            // Mark the base as loaded before intent validation to avoid re-entrant loading.
+            knowledgeBase.forEach(intent => {
+                const eligiblePrompts = (intent.suggestionPool || []).filter(prompt => {
+                    try {
+                        return matchIntent(prompt).intentId === intent.id;
+                    } catch (_) {
+                        return false;
+                    }
+                });
+                if (eligiblePrompts.length > 0) {
+                    if (!categorizedSuggestions[intent.category]) categorizedSuggestions[intent.category] = [];
+                    categorizedSuggestions[intent.category].push(...eligiblePrompts);
+                }
+            });
+
+            availableCategories = Object.keys(categorizedSuggestions);
+            // Prioritise current End-Term syllabus prompts in the random carousel.
+            weightedSuggestionCategories = availableCategories.flatMap(category =>
+                category === 'End-Term Syllabus' ? [category, category, category] : [category]
+            );
+            resetSuggestionGenerator();
+        }
         
         // Generator function for infinite suggestions
         function* suggestionGenerator() {
@@ -7996,6 +8188,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
         }
 
         function renderSuggestionPills() {
+            ensureAskDataLoaded();
             const container = document.getElementById('suggestion-pills');
             container.innerHTML = '';
             
@@ -8217,7 +8410,6 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
         let learnPlaylistIds = [];
         let learnActiveIndex = 0;
         let learnLastSkipKey = null;
-        let learnPendingAutoPlay = false;
         let learnRestoringSavedIndex = null;
         let learnFocusSavedThumbnailPending = false;
         let learnProgress = {};
@@ -8421,15 +8613,18 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             const promoToggleEl = document.getElementById('promo-banner-toggle');
             promoToggleEl.checked = promoBannerConsent;
 
-            // Model Selection Preference
-            let currentModel = getPreference('circleSelectedModel', 'core');
-            if (currentModel !== 'swift' && currentModel !== 'core') {
-                currentModel = 'core'; // invalid value fallback
-                setPreference('circleSelectedModel', 'core');
-            } else {
-                // Ensure default is explicitly saved if missing
-                setPreference('circleSelectedModel', currentModel);
+            // Model Selection Preference. The earlier build saved "core" as its default,
+            // so apply this one-time migration to Swift unless the user changes models again.
+            let currentModel = getPreference('circleSelectedModel', 'swift');
+            const swiftDefaultMigrationKey = 'circleSwiftDefaultAppliedV1';
+            if (getPreference(swiftDefaultMigrationKey, 'false') !== 'true') {
+                if (currentModel === 'core') currentModel = 'swift';
+                setPreference(swiftDefaultMigrationKey, 'true');
             }
+            if (currentModel !== 'swift' && currentModel !== 'core') {
+                currentModel = 'swift'; // invalid value fallback
+            }
+            setPreference('circleSelectedModel', currentModel);
             selectModelUI(currentModel);
             if (!circleUserId) {
                 circleUserId = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : ('circle_' + Date.now() + '_' + Math.random().toString(36).slice(2));
@@ -8443,6 +8638,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             setupEventListeners();
             setupCircleLibraryUI();
             setupDonationUI();
+            refreshInstallControls();
 
             if (isRegistered === 'true' && userName && profilePhotoDataUrl) {
                 /* Re-check stored profiles at startup. Invalid profiles return to
@@ -8733,6 +8929,15 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             await startMainInterface();
             switchCircleMode('learn');
             startCircleDonationUsageTracker();
+
+            const installPromptShownKey = 'circle_v2_install_registration_prompt_shown_v1';
+            if (!isRunningAsInstalledPWA() && localStorage.getItem(installPromptShownKey) !== 'true') {
+                localStorage.setItem(installPromptShownKey, 'true');
+                // Let the Learn screen appear first; installation remains entirely optional.
+                setTimeout(() => {
+                    if (!isRunningAsInstalledPWA()) showInstallModal();
+                }, 1200);
+            }
         }
 
         async function handleOnboardingPhotoUpload(event) {
@@ -8797,12 +9002,11 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             const mainLayer = document.getElementById('main-layer');
             mainLayer.classList.remove('hidden');
             document.getElementById('app-shell-header').classList.add('ready');
-            ensureLearnPlayerAPI();
+            // Paint playlist placeholders immediately. The YouTube API is requested when
+            // switchCircleMode('learn') activates the default Learn view.
             
             await sleep(50);
             mainLayer.classList.add('main-layer-visible');
-
-            renderSuggestionPills();
 
             const rot = document.getElementById('greeting-rotator');
             let currentIdx = Math.floor(Math.random() * greetingsList.length);
@@ -8817,10 +9021,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             
             document.getElementById('settings-btn').classList.remove('hidden');
             
-            const pwaInstalled = localStorage.getItem('circle_pwa_installed') === 'true';
-            if (!pwaInstalled && !isRunningAsInstalledPWA() && deferredPrompt) {
-                document.getElementById('install-btn').classList.remove('hidden');
-            }
+            refreshInstallControls();
             
             document.getElementById('share-btn').classList.remove('hidden');
         }
@@ -8933,6 +9134,10 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
          *******************************************************/
         function showPromoModal() {
             const modal = document.getElementById('promo-modal');
+            const promoImage = modal ? modal.querySelector('.promo-image') : null;
+            if (promoImage && !promoImage.getAttribute('src')) {
+                promoImage.setAttribute('src', promoImage.dataset.src || 'circle-promo.png');
+            }
             const closeBtn = document.getElementById('promo-close');
             const ring = document.querySelector('.promo-ring-progress');
             
@@ -9853,6 +10058,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             const installBtn = document.getElementById('install-btn');
             const installCloseBtn = document.getElementById('install-close');
             const pwaInstallBtn = document.getElementById('pwa-install-btn');
+            const installContinueBtn = document.getElementById('install-continue-btn');
             
             const shareBtn = document.getElementById('share-btn');
             
@@ -9877,6 +10083,7 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             installBtn.addEventListener('click', showInstallModal);
             installCloseBtn.addEventListener('click', closeInstallModal);
             pwaInstallBtn.addEventListener('click', handleInstallClick);
+            installContinueBtn.addEventListener('click', closeInstallModal);
             
             shareBtn.addEventListener('click', handleShare);
             
@@ -10158,9 +10365,9 @@ You can watch the relevant video lectures in **Circle AI → Learn** by selectin
             scrollToBottom();
 
             // Check selected model
-            let currentModel = getPreference('circleSelectedModel', 'core');
-            if (currentModel !== 'swift') {
-                currentModel = 'core';
+            let currentModel = getPreference('circleSelectedModel', 'swift');
+            if (currentModel !== 'swift' && currentModel !== 'core') {
+                currentModel = 'swift';
             }
 
             // Adjust delay based on model
@@ -10561,6 +10768,11 @@ setInterval(() => {
                 closeLearnCourseMenu();
                 initializeLearnIfNeeded();
             } else {
+                ensureAskDataLoaded();
+                if (!isChatMode) {
+                    const suggestionContainer = document.getElementById('suggestion-pills');
+                    if (suggestionContainer && !suggestionContainer.children.length) renderSuggestionPills();
+                }
                 document.getElementById('learn-layer').classList.remove('visible');
                 document.getElementById('main-layer').classList.remove('shell-hidden');
                 setShellModeButton('ask');
@@ -10636,6 +10848,7 @@ setInterval(() => {
         }
 
         function initializeLearnIfNeeded() {
+            if (!learnPlaylistIds.length) renderLearnThumbnails();
             if (learnPlayerReady) {
                 loadLearnCourse(learnActiveCourseId, false);
             } else {
@@ -10653,6 +10866,7 @@ setInterval(() => {
                 playsinline: '1',
                 rel: '0',
                 controls: '1',
+                autoplay: '0',
                 iv_load_policy: '3',
                 start: String(Math.max(0, Math.floor(startSeconds)))
             });
@@ -10673,7 +10887,7 @@ setInterval(() => {
             iframe.frameBorder = '0';
             iframe.allowFullscreen = true;
             iframe.referrerPolicy = 'origin';
-            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+            iframe.setAttribute('allow', 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
             iframe.setAttribute('loading', 'eager');
             iframe.style.display = 'block';
             iframe.style.width = '100%';
@@ -10710,7 +10924,7 @@ setInterval(() => {
                             const playerFrame = event.target.getIframe();
                             if (playerFrame) {
                                 playerFrame.referrerPolicy = 'origin';
-                                playerFrame.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                                playerFrame.setAttribute('allow', 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
                             }
                         } catch (_) {}
 
@@ -10724,26 +10938,26 @@ setInterval(() => {
                         renderLearnThumbnails();
 
                         if (initialCourse.type === 'playlist' && savedIndex > 0) {
-                            setTimeout(() => {
-                                try {
-                                    learnActiveIndex = savedIndex;
-                                    learnPlayer.playVideoAt(savedIndex);
-                                } catch (_) {}
-                                renderLearnThumbnails();
-                            }, 500);
-                        } else if (savedIndex === 0) {
+                            // Restore the saved lesson in a cued/paused state. Selecting a saved
+                            // lesson must never start playback without a user's Play action.
+                            try {
+                                learnPlayer.cuePlaylist({
+                                    listType: 'playlist',
+                                    list: initialCourse.playlistId,
+                                    index: savedIndex,
+                                    startSeconds: LEARN_INTRO_SKIP_SECONDS
+                                });
+                            } catch (error) {
+                                console.warn('Unable to cue the saved Learn lesson:', error);
+                            }
+                            learnActiveIndex = savedIndex;
+                            renderLearnThumbnails();
+                            updateLearnCourseUI();
+                        } else {
                             learnRestoringSavedIndex = null;
                         }
 
-                        const shouldAutoPlay = learnPendingAutoPlay;
-                        learnPendingAutoPlay = false;
-                        if (shouldAutoPlay) {
-                            setTimeout(() => {
-                                try { learnPlayer.playVideo(); } catch (_) {}
-                            }, Math.max(650, savedIndex > 0 ? 900 : 650));
-                        }
-
-                        setTimeout(() => enforceLearnIntroSkip(), 450);
+                        // The YouTube player stays paused until the user presses Play.
                         syncLearnPlaylistHeight();
                     },
                     onStateChange: handleLearnPlayerStateChange,
@@ -11197,7 +11411,6 @@ setInterval(() => {
             flushLearnNotesSave();
             const nextCourseId = LEARN_COURSES[courseId] ? courseId : 'businessCommunication';
             if (!learnPlayerReady) {
-                learnPendingAutoPlay = Boolean(autoPlay);
                 learnActiveCourseId = nextCourseId;
                 try { localStorage.setItem('circle_v2_learn_active_course', learnActiveCourseId); } catch (_) {}
                 return;
@@ -11208,9 +11421,6 @@ setInterval(() => {
                 refreshLearnPlaylist(0);
                 renderLearnCourseMenu();
                 updateLearnCourseUI();
-                if (autoPlay) {
-                    setTimeout(() => { try { learnPlayer.playVideo(); } catch (_) {} }, 200);
-                }
                 return;
             }
 
@@ -11225,7 +11435,6 @@ setInterval(() => {
             learnFocusSavedThumbnailPending = true;
             learnLastSkipKey = null;
             learnPlaylistIds = [];
-            learnPendingAutoPlay = Boolean(autoPlay);
 
             try {
                 localStorage.setItem('circle_v2_learn_active_course', learnActiveCourseId);
@@ -11379,8 +11588,13 @@ setInterval(() => {
 
         function renderLearnThumbnails() {
             const container = document.getElementById('learn-thumbnails');
+            if (!container) return;
+
             if (!learnPlaylistIds.length) {
-                container.innerHTML = '';
+                // Reserve the same 16:9 thumbnail dimensions while the playlist/API loads.
+                container.innerHTML = Array.from({ length: 6 }, (_, index) =>
+                    `<div class="learn-thumb learn-thumb-skeleton-only" aria-hidden="true" data-skeleton-index="${index}"></div>`
+                ).join('');
                 return;
             }
 
@@ -11393,13 +11607,41 @@ setInterval(() => {
                             type="button"
                             data-learn-index="${index}"
                             aria-label="Lecture ${String(index + 1).padStart(2, '0')}">
-                        <img loading="lazy" src="https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg" alt="">
+                        <img loading="lazy" decoding="async" fetchpriority="low" src="https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg" alt="">
                     </button>
                 `;
             }).join('');
 
             container.querySelectorAll('.learn-thumb').forEach(button => {
+                const image = button.querySelector('img');
                 button.addEventListener('click', () => openLearnLesson(Number(button.dataset.learnIndex)));
+                if (!image) return;
+
+                const revealFullyLoadedImage = () => {
+                    if (!image.isConnected || !image.complete || image.naturalWidth < 1) return;
+                    const reveal = () => {
+                        if (!image.isConnected || image.naturalWidth < 1) return;
+                        image.classList.add('image-loaded');
+                        button.classList.add('thumbnail-loaded');
+                    };
+                    if (typeof image.decode === 'function') {
+                        image.decode().then(reveal).catch(() => {
+                            // Do not expose a thumbnail whose decode did not complete.
+                            button.classList.remove('thumbnail-loaded');
+                            image.classList.remove('image-loaded');
+                        });
+                    } else {
+                        reveal();
+                    }
+                };
+
+                image.addEventListener('load', revealFullyLoadedImage, { once: true });
+                image.addEventListener('error', () => {
+                    // Keep the grey skeleton visible if the thumbnail is broken or incomplete.
+                    button.classList.remove('thumbnail-loaded');
+                    image.classList.remove('image-loaded');
+                }, { once: true });
+                if (image.complete && image.naturalWidth > 0) revealFullyLoadedImage();
             });
 
             if (learnFocusSavedThumbnailPending) {
@@ -11643,6 +11885,7 @@ setInterval(() => {
          * 11. INTENT MATCHING ENGINE (No Backend/API)
          *******************************************************/
         function matchIntent(query) {
+            ensureAskDataLoaded();
             const normalizedQuery = query.toLowerCase().replace(/[^\w\s-]/gi, ' ');
             const paddedQuery = " " + normalizedQuery + " "; 
             let matchedIntents = [];
@@ -11973,6 +12216,25 @@ setInterval(() => {
             return `upi://pay?${params.toString()}`;
         }
 
+        let circleQRCodeLibraryPromise = null;
+        function ensureQRCodeLibrary() {
+            if (window.QRCode) return Promise.resolve(window.QRCode);
+            if (circleQRCodeLibraryPromise) return circleQRCodeLibraryPromise;
+
+            circleQRCodeLibraryPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+                script.async = true;
+                script.onload = () => window.QRCode ? resolve(window.QRCode) : reject(new Error('QRCode library unavailable'));
+                script.onerror = () => reject(new Error('QRCode library failed to load'));
+                document.head.appendChild(script);
+            }).catch(error => {
+                circleQRCodeLibraryPromise = null; // allow a later retry
+                throw error;
+            });
+            return circleQRCodeLibraryPromise;
+        }
+
         function renderDonationQr() {
             const qr = document.getElementById('donation-qr');
             if (!qr) return;
@@ -11991,7 +12253,7 @@ setInterval(() => {
             } else {
                 const fallback = document.createElement('div');
                 fallback.style.cssText = 'width:170px;height:170px;display:flex;align-items:center;justify-content:center;text-align:center;color:#111;font:600 11px Arial;padding:15px;box-sizing:border-box;';
-                fallback.textContent = 'UPI QR is loading…';
+                fallback.textContent = 'Loading QR…';
                 qr.appendChild(fallback);
             }
         }
@@ -12047,6 +12309,20 @@ setInterval(() => {
             void modal.offsetWidth;
             modal.classList.add('show');
             modal.setAttribute('aria-hidden', 'false');
+
+            // Load the QR library only when the user opens Support Circle AI.
+            ensureQRCodeLibrary().then(() => {
+                if (modal.classList.contains('show')) renderDonationQr();
+            }).catch(() => {
+                const qr = document.getElementById('donation-qr');
+                if (qr && modal.classList.contains('show')) {
+                    qr.replaceChildren();
+                    const fallback = document.createElement('div');
+                    fallback.style.cssText = 'width:170px;height:170px;display:flex;align-items:center;justify-content:center;text-align:center;color:#111;font:600 11px Arial;padding:15px;box-sizing:border-box;';
+                    fallback.textContent = 'QR could not load. Use the Open UPI app option instead.';
+                    qr.appendChild(fallback);
+                }
+            });
 
             /* Count nudge-origin support interest only if the donation window remains open
                for five seconds. This is not payment verification. */
